@@ -1,0 +1,2330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OneAtATime | The Dating App Built for Introverts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================
+       FIBONACCI SPACING SYSTEM
+       Sequence: 1, 2, 3, 5, 8, 13, 21, 34, 55, 89
+       Base unit: 1px (scaled up for usability)
+       ============================================ */
+    :root {
+      /* Fibonacci scale (base 8px) */
+      --fib-1: 8px;
+      --fib-2: 13px;
+      --fib-3: 21px;
+      --fib-4: 34px;
+      --fib-5: 55px;
+      --fib-6: 89px;
+      --fib-7: 144px;
+      --fib-8: 233px;
+
+      /* Color Palette - Deep Ocean */
+      --ocean-abyss: #0a1628;
+      --ocean-deep: #0f2744;
+      --ocean-mid: #1a3a5c;
+      --ocean-surface: #2d5a7b;
+      --teal-glow: #00d4aa;
+      --teal-soft: #4ecdc4;
+      --coral-accent: #ff6b6b;
+      --pearl-white: #f8f9fa;
+      --pearl-soft: #e9ecef;
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.7);
+      --text-muted: rgba(255, 255, 255, 0.5);
+
+      /* Typography */
+      --font-family: 'Plus Jakarta Sans', sans-serif;
+      --font-size-xs: 13px;
+      --font-size-sm: 14px;
+      --font-size-base: 16px;
+      --font-size-lg: 21px;
+      --font-size-xl: 34px;
+      --font-size-2xl: 55px;
+      --font-size-3xl: 89px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background: var(--ocean-abyss);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* ============================================
+       UNIFIED HERO WITH ANIMATION STATES
+       ============================================ */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--fib-6);
+      padding: var(--fib-6);
+      align-items: center;
+      background: linear-gradient(135deg, 
+        var(--ocean-abyss) 0%, 
+        var(--ocean-deep) 50%, 
+        var(--ocean-mid) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Ambient bubbles */
+    .hero::before {
+      content: '';
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, 
+        rgba(0, 212, 170, 0.1) 0%, 
+        transparent 70%);
+      top: 20%;
+      right: 10%;
+      animation: float 8s ease-in-out infinite;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, 
+        rgba(78, 205, 196, 0.08) 0%, 
+        transparent 70%);
+      bottom: 30%;
+      left: 5%;
+      animation: float 10s ease-in-out infinite reverse;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-30px) scale(1.1); }
+    }
+
+    /* ============================================
+       INTRO OVERLAY (Chaotic Fish)
+       ============================================ */
+    .intro-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(180deg, 
+        var(--ocean-abyss) 0%, 
+        var(--ocean-deep) 50%, 
+        var(--ocean-mid) 100%);
+      z-index: 100;
+      pointer-events: none;
+      opacity: 1;
+      transition: opacity 1.2s ease-out;
+    }
+
+    .intro-overlay.fade-out {
+      opacity: 0;
+    }
+
+    .intro-label {
+      position: fixed;
+      top: var(--fib-5);
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      font-size: var(--font-size-lg);
+      font-weight: 600;
+      color: var(--coral-accent);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0;
+      z-index: 101;
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .intro-label.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .intro-label.fade-out {
+      opacity: 0;
+    }
+
+    /* School of Fish Container */
+    .fish-school {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 101;
+      pointer-events: none;
+      transition: opacity 1.2s ease-out;
+    }
+
+    .fish-school.fade-out {
+      opacity: 0;
+    }
+
+    .chaotic-fish {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      opacity: 0;
+    }
+
+    /* Fish swimming left to right */
+    .chaotic-fish.swim-right {
+      animation: swimRight var(--swim-duration, 8s) linear var(--swim-delay, 0s) infinite;
+    }
+
+    .chaotic-fish.swim-right svg {
+      transform: scaleX(-1); /* Face right (direction of movement) */
+    }
+
+    /* Fish swimming right to left */
+    .chaotic-fish.swim-left {
+      animation: swimLeft var(--swim-duration, 8s) linear var(--swim-delay, 0s) infinite;
+    }
+
+    .chaotic-fish.swim-left svg {
+      transform: scaleX(1); /* Face left (direction of movement) */
+    }
+
+    .chaotic-fish svg {
+      width: var(--fish-size, 40px);
+      height: auto;
+      fill: none;
+      stroke: var(--text-secondary);
+      stroke-width: 2;
+    }
+
+    .chaotic-fish .message {
+      background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.15) 0%, 
+        rgba(255, 255, 255, 0.08) 100%);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: var(--fib-1) var(--fib-2);
+      border-radius: var(--fib-2);
+      font-size: 11px;
+      color: var(--pearl-white);
+      white-space: nowrap;
+      max-width: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%) scale(0.8);
+      opacity: 0;
+      animation: popBubble var(--bubble-duration, 3s) ease-out var(--bubble-delay, 0s) infinite;
+    }
+
+    /* Speech bubble pointer */
+    .chaotic-fish .message::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 6px solid rgba(255, 255, 255, 0.25);
+    }
+
+    @keyframes popBubble {
+      0% {
+        opacity: 0;
+        transform: translateX(-50%) scale(0.7) translateY(5px);
+      }
+      15% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1) translateY(0);
+      }
+      65% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1) translateY(0);
+      }
+      80% {
+        opacity: 0;
+        transform: translateX(-50%) scale(0.9) translateY(-3px);
+      }
+      100% {
+        opacity: 0;
+        transform: translateX(-50%) scale(0.7) translateY(5px);
+      }
+    }
+
+    @keyframes swimRight {
+      0% {
+        transform: translateX(-300px);
+        opacity: 0;
+      }
+      5% {
+        opacity: 0.8;
+      }
+      95% {
+        opacity: 0.8;
+      }
+      100% {
+        transform: translateX(calc(100vw + 100px));
+        opacity: 0;
+      }
+    }
+
+    @keyframes swimLeft {
+      0% {
+        transform: translateX(calc(100vw + 100px));
+        opacity: 0;
+      }
+      5% {
+        opacity: 0.8;
+      }
+      95% {
+        opacity: 0.8;
+      }
+      100% {
+        transform: translateX(-300px);
+        opacity: 0;
+      }
+    }
+
+    /* ============================================
+       HERO CONTENT (Slides in from left)
+       ============================================ */
+    .hero-content {
+      z-index: 1;
+      padding-left: var(--fib-5);
+      opacity: 0;
+      transform: translateX(-60px);
+      transition: opacity 1.2s ease-out, transform 1.2s ease-out;
+    }
+
+    .hero-content.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .logo-container {
+      margin-bottom: var(--fib-4);
+    }
+
+    .logo-container svg {
+      width: var(--fib-5);
+      height: auto;
+      fill: none;
+      stroke: var(--teal-glow);
+      stroke-width: 2;
+    }
+
+    .brand-name {
+      font-size: var(--font-size-3xl);
+      font-weight: 800;
+      background: linear-gradient(135deg, 
+        var(--teal-glow) 0%, 
+        var(--teal-soft) 50%, 
+        var(--pearl-white) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.1;
+      margin-bottom: var(--fib-3);
+    }
+
+    .tagline {
+      font-size: var(--font-size-xl);
+      font-weight: 300;
+      color: var(--text-secondary);
+      margin-bottom: var(--fib-5);
+      line-height: 1.4;
+    }
+
+    .tagline span {
+      color: var(--teal-glow);
+      font-weight: 500;
+    }
+
+    .value-props {
+      display: flex;
+      flex-direction: column;
+      gap: var(--fib-3);
+      margin-bottom: var(--fib-5);
+    }
+
+    .value-prop {
+      display: flex;
+      align-items: center;
+      gap: var(--fib-2);
+      font-size: var(--font-size-base);
+      color: var(--text-secondary);
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+
+    .value-prop.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .value-prop svg {
+      width: var(--fib-3);
+      height: var(--fib-3);
+      stroke: var(--teal-glow);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    /* ============================================
+       FISH CONVERSATION (Animates from center to right)
+       ============================================ */
+    .hero-fish-container {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 102;
+      transition: top 1.5s cubic-bezier(0.4, 0, 0.2, 1),
+                  left 1.5s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .hero-fish-container.final-position {
+      position: relative;
+      top: auto !important;
+      left: auto !important;
+      transform: none !important;
+      transition: none;
+    }
+
+    .hero-fish-conversation {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--fib-4);
+      opacity: 0;
+      transform: scale(1.3);
+      transition: opacity 0.8s ease-out;
+    }
+
+    .hero-fish-conversation.visible {
+      opacity: 1;
+    }
+
+    .hero-fish-conversation.final-size {
+      transform: scale(1);
+    }
+
+    /* Float animation for intro (when still scaled at 1.3x) */
+    .hero-fish-conversation.animate-float {
+      animation: gentleFloatScaled 6s ease-in-out infinite;
+      will-change: transform;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    /* Float animation after shrinking to 1x */
+    .hero-fish-conversation.animate-float.final-size {
+      animation: gentleFloat 6s ease-in-out infinite;
+    }
+
+    @keyframes gentleFloatScaled {
+      0% { transform: scale(1.3) translateY(0); }
+      50% { transform: scale(1.3) translateY(-15px); }
+      100% { transform: scale(1.3) translateY(0); }
+    }
+
+    @keyframes gentleFloat {
+      0% { transform: scale(1) translateY(0); }
+      50% { transform: scale(1) translateY(-15px); }
+      100% { transform: scale(1) translateY(0); }
+    }
+
+    .hero-fish-pair {
+      display: flex;
+      align-items: flex-end;
+      gap: var(--fib-4);
+    }
+
+    .hero-fish {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--fib-2);
+    }
+
+    .hero-fish svg {
+      width: 100px;
+      height: auto;
+      fill: none;
+      stroke: var(--teal-glow);
+      stroke-width: 2;
+      filter: drop-shadow(0 0 20px rgba(0, 212, 170, 0.3));
+      transform: scaleX(-1); /* First fish faces RIGHT (toward partner) */
+    }
+
+    .hero-fish:last-child svg {
+      transform: scaleX(1); /* Second fish faces LEFT (toward partner) */
+      stroke: var(--teal-soft);
+      filter: drop-shadow(0 0 20px rgba(78, 205, 196, 0.3));
+    }
+
+    .hero-bubble {
+      background: linear-gradient(135deg, 
+        rgba(0, 212, 170, 0.2) 0%, 
+        rgba(78, 205, 196, 0.1) 100%);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 212, 170, 0.4);
+      padding: var(--fib-3);
+      border-radius: var(--fib-3);
+      font-size: 13px;
+      line-height: 1.4;
+      color: var(--pearl-white);
+      position: relative;
+      width: 180px;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      text-align: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .hero-bubble.visible {
+      opacity: 1;
+    }
+
+    .hero-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 8px solid rgba(0, 212, 170, 0.4);
+    }
+
+    .hero-fish:last-child .hero-bubble {
+      background: linear-gradient(135deg, 
+        rgba(78, 205, 196, 0.2) 0%, 
+        rgba(0, 212, 170, 0.1) 100%);
+      border-color: rgba(78, 205, 196, 0.4);
+    }
+
+    .hero-fish:last-child .hero-bubble::after {
+      border-top-color: rgba(78, 205, 196, 0.4);
+    }
+
+    /* Conversation label that appears above fish during intro */
+    .conversation-label {
+      font-size: var(--font-size-xl);
+      font-weight: 700;
+      color: var(--teal-glow);
+      letter-spacing: 2px;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+      position: absolute;
+      top: -160px;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      text-shadow: 0 0 30px rgba(0, 212, 170, 0.3);
+    }
+
+    .conversation-label.visible {
+      opacity: 1;
+    }
+
+    .conversation-label.fade-out {
+      opacity: 0;
+    }
+
+    /* ============================================
+       SIGN UP SECTION
+       ============================================ */
+    .signup-section {
+      background: linear-gradient(180deg, 
+        var(--ocean-mid) 0%, 
+        var(--ocean-deep) 100%);
+      padding: var(--fib-7) var(--fib-6);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--fib-6);
+      align-items: center;
+      position: relative;
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 1s ease-out, transform 1s ease-out;
+    }
+
+    .signup-section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .signup-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        var(--teal-glow) 50%, 
+        transparent 100%);
+    }
+
+    .signup-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    /* Profile Card Stack */
+    .match-stack-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      width: 100%;
+      height: 450px;
+      perspective: 1000px;
+    }
+
+    .match-card {
+      position: absolute;
+      width: var(--fib-8); /* 233px */
+      height: 377px; /* fib-8 + fib-7 */
+      background: var(--ocean-abyss);
+      border: 2px solid var(--teal-glow);
+      border-radius: var(--fib-4); /* Rounded like Bumble */
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4),
+                  0 0 20px rgba(0, 212, 170, 0.2);
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+                  opacity 0.6s ease;
+    }
+
+    .match-card .profile-photo {
+      width: 100%;
+      height: 85%;
+      object-fit: cover;
+      border-radius: var(--fib-4) var(--fib-4) 0 0;
+    }
+
+    .match-card .profile-info {
+      padding: var(--fib-2) var(--fib-3);
+      background: linear-gradient(180deg, 
+        var(--ocean-deep) 0%, 
+        var(--ocean-abyss) 100%);
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: var(--fib-2);
+    }
+
+    .match-card .profile-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--pearl-white);
+    }
+
+    .match-card .profile-age {
+      font-size: 16px;
+      color: var(--text-secondary);
+    }
+
+    .match-card .verified-badge {
+      width: 18px;
+      height: 18px;
+      fill: var(--teal-glow);
+      margin-left: auto;
+    }
+
+    /* Card stack positions - horizontal (left to right) */
+    .match-card:nth-child(1) {
+      z-index: 5;
+      transform: translateX(0) translateY(0) scale(1);
+    }
+    .match-card:nth-child(2) {
+      z-index: 4;
+      transform: translateX(-20px) translateY(0) scale(0.95);
+      opacity: 0.8;
+    }
+    .match-card:nth-child(3) {
+      z-index: 3;
+      transform: translateX(-40px) translateY(0) scale(0.9);
+      opacity: 0.6;
+    }
+    .match-card:nth-child(4) {
+      z-index: 2;
+      transform: translateX(-60px) translateY(0) scale(0.85);
+      opacity: 0.4;
+    }
+
+    /* Animation for card cycling - up and to the right */
+    .match-card.slide-up {
+      animation: slideUpAndOut 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    @keyframes slideUpAndOut {
+      0% {
+        transform: translateX(0) translateY(0) scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: translateX(150px) translateY(-150px) scale(0.8);
+        opacity: 0;
+      }
+    }
+
+    .match-card.slide-in {
+      animation: slideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    @keyframes slideIn {
+      0% {
+        transform: translateX(100px) translateY(0) scale(0.8);
+        opacity: 0;
+      }
+      100% {
+        transform: translateX(-60px) translateY(0) scale(0.85);
+        opacity: 0.4;
+      }
+    }
+
+    .pearl-offer {
+      display: flex;
+      align-items: center;
+      gap: var(--fib-2);
+      margin-bottom: var(--fib-4);
+      padding: var(--fib-2) var(--fib-4);
+      background: linear-gradient(135deg, 
+        rgba(0, 212, 170, 0.15) 0%, 
+        rgba(78, 205, 196, 0.1) 100%);
+      border: 1px solid rgba(0, 212, 170, 0.3);
+      border-radius: var(--fib-5);
+    }
+
+    .pearls {
+      display: flex;
+      gap: var(--fib-1);
+    }
+
+    .pearl {
+      width: var(--fib-3);
+      height: var(--fib-3);
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, 
+        #fff 0%, 
+        #e0e0e0 40%, 
+        #b0b0b0 100%);
+      box-shadow: 
+        inset -2px -2px 4px rgba(0,0,0,0.2),
+        inset 2px 2px 4px rgba(255,255,255,0.8),
+        0 2px 8px rgba(0, 212, 170, 0.3);
+      animation: pearlShine 2s ease-in-out infinite;
+    }
+
+    .pearl:nth-child(2) { animation-delay: 0.3s; }
+    .pearl:nth-child(3) { animation-delay: 0.6s; }
+
+    @keyframes pearlShine {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .pearl-text {
+      font-size: var(--font-size-sm);
+      color: var(--teal-glow);
+      font-weight: 600;
+    }
+
+    .signup-title {
+      font-size: var(--font-size-2xl);
+      font-weight: 700;
+      margin-bottom: var(--fib-3);
+      color: var(--pearl-white);
+    }
+
+    .signup-subtitle {
+      font-size: var(--font-size-lg);
+      color: var(--text-secondary);
+      margin-bottom: var(--fib-5);
+      max-width: 600px;
+    }
+
+    .signup-form {
+      display: flex;
+      gap: var(--fib-2);
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .email-input {
+      flex: 1;
+      padding: var(--fib-3) var(--fib-4);
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--fib-3);
+      font-family: var(--font-family);
+      font-size: var(--font-size-base);
+      color: var(--pearl-white);
+      transition: all 0.3s ease;
+    }
+
+    .email-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .email-input:focus {
+      outline: none;
+      border-color: var(--teal-glow);
+      background: rgba(0, 212, 170, 0.05);
+      box-shadow: 0 0 20px rgba(0, 212, 170, 0.2);
+    }
+
+    .submit-btn {
+      padding: var(--fib-3) var(--fib-4);
+      background: linear-gradient(135deg, 
+        var(--teal-glow) 0%, 
+        var(--teal-soft) 100%);
+      border: none;
+      border-radius: var(--fib-3);
+      font-family: var(--font-family);
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      color: var(--ocean-abyss);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 212, 170, 0.4);
+    }
+
+    .submit-btn:active {
+      transform: translateY(0);
+    }
+
+    .privacy-note {
+      margin-top: var(--fib-3);
+      font-size: var(--font-size-xs);
+      color: var(--text-muted);
+    }
+
+    /* ============================================
+       FOOTER
+       ============================================ */
+    footer {
+      background: var(--ocean-abyss);
+      padding: var(--fib-5) var(--fib-6);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      opacity: 0;
+      transition: opacity 1s ease-out 0.3s;
+    }
+
+    footer.visible {
+      opacity: 1;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: var(--fib-2);
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .footer-logo svg {
+      width: var(--fib-4);
+      height: auto;
+      stroke: var(--teal-glow);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .footer-text {
+      font-size: var(--font-size-xs);
+      color: var(--text-muted);
+    }
+
+    /* ============================================
+       BOBBERS SECTION
+       ============================================ */
+    .bobbers-container {
+      position: absolute;
+      bottom: var(--fib-5);
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      justify-content: center;
+      gap: var(--fib-7);
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 1s ease-out;
+    }
+
+    .bobbers-container.visible {
+      opacity: 1;
+    }
+
+    .bobber-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .bobber-wrapper:hover {
+      transform: translateY(-8px);
+    }
+
+    .bobber-wrapper:hover .bobber {
+      filter: drop-shadow(0 8px 20px rgba(255, 107, 107, 0.4));
+    }
+
+    .bobber-label {
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      color: var(--pearl-white);
+      margin-bottom: var(--fib-3);
+      letter-spacing: 1px;
+    }
+
+    .bobber {
+      width: 55px; /* fib-5 */
+      height: 89px; /* fib-6 */
+      position: relative;
+      transition: filter 0.3s ease;
+    }
+
+    .bobber-top {
+      width: 21px; /* fib-3 */
+      height: 13px; /* fib-2 */
+      background: linear-gradient(180deg, #d44 0%, #c33 100%);
+      border-radius: 4px 4px 0 0;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .bobber-body {
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, 
+        #fff 0%, 
+        #fff 45%, 
+        #e53935 45%, 
+        #c62828 100%);
+      box-shadow: 
+        inset -4px -4px 8px rgba(0,0,0,0.15),
+        inset 4px 4px 8px rgba(255,255,255,0.3),
+        0 4px 15px rgba(0,0,0,0.3);
+      position: relative;
+    }
+
+    .bobber-body::after {
+      content: '';
+      position: absolute;
+      top: 44%;
+      left: 5%;
+      right: 5%;
+      height: 3px;
+      background: #c62828;
+      border-radius: 2px;
+    }
+
+    .fishing-line {
+      width: 2px;
+      height: 89px; /* fib-6 */
+      background: linear-gradient(180deg, 
+        rgba(255,255,255,0.6) 0%, 
+        rgba(255,255,255,0.2) 100%);
+      margin: 0 auto;
+    }
+
+    /* ============================================
+       WAVE SEPARATOR
+       ============================================ */
+    .wave-separator {
+      position: relative;
+      width: 100%;
+      height: var(--fib-6);
+      background: linear-gradient(180deg, 
+        var(--ocean-mid) 0%, 
+        var(--ocean-deep) 100%);
+      overflow: hidden;
+    }
+
+    .wave-separator svg {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .wave-separator .wave-back {
+      fill: var(--ocean-deep);
+      opacity: 0.5;
+    }
+
+    .wave-separator .wave-mid {
+      fill: var(--teal-glow);
+      opacity: 0.3;
+    }
+
+    .wave-separator .wave-front {
+      fill: var(--ocean-deep);
+    }
+
+    /* ============================================
+       LEARN MORE SECTION
+       ============================================ */
+    .learn-more-section {
+      min-height: 100vh;
+      background: linear-gradient(180deg, 
+        var(--ocean-deep) 0%, 
+        var(--ocean-abyss) 100%);
+      padding: var(--fib-7) var(--fib-6);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--fib-6);
+      align-items: center;
+      position: relative;
+    }
+
+    /* Phone Mockup */
+    .phone-container {
+      display: flex;
+      justify-content: center;
+    }
+
+    .phone-mockup {
+      width: 280px;
+      height: 560px;
+      border: 3px solid var(--teal-glow);
+      border-radius: 34px;
+      padding: 13px;
+      position: relative;
+      background: var(--ocean-abyss);
+    }
+
+    .phone-mockup::before {
+      content: '';
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 21px;
+      background: var(--ocean-abyss);
+      border: 2px solid var(--teal-glow);
+      border-radius: 13px;
+    }
+
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      background: var(--ocean-deep);
+      border-radius: 21px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-header {
+      padding: var(--fib-2) var(--fib-3);
+      background: var(--ocean-mid);
+      border-bottom: 1px solid rgba(0, 212, 170, 0.2);
+      display: flex;
+      align-items: center;
+      gap: var(--fib-2);
+    }
+
+    .chat-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--teal-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .chat-avatar svg {
+      width: 20px;
+      height: auto;
+      stroke: var(--ocean-abyss);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .chat-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--pearl-white);
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: var(--fib-3);
+      display: flex;
+      flex-direction: column;
+      gap: var(--fib-2);
+      overflow-y: auto;
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE/Edge */
+    }
+
+    .chat-messages::-webkit-scrollbar {
+      display: none; /* Chrome, Safari, Opera */
+    }
+
+    .chat-msg {
+      max-width: 80%;
+      padding: var(--fib-2);
+      border-radius: 13px;
+      font-size: 12px;
+      line-height: 1.4;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .chat-msg.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .chat-msg.sent {
+      background: var(--teal-glow);
+      color: var(--ocean-abyss);
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+
+    .chat-msg.received {
+      background: var(--ocean-mid);
+      color: var(--pearl-white);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+
+    /* Fish Profile Section */
+    .fish-profile-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--fib-4);
+    }
+
+    .big-fish {
+      position: relative;
+      animation: bigFishFloat 4s ease-in-out infinite;
+    }
+
+    .big-fish svg {
+      width: 200px;
+      height: auto;
+      stroke: var(--teal-glow);
+      fill: none;
+      stroke-width: 1.5;
+      filter: drop-shadow(0 0 30px rgba(0, 212, 170, 0.3));
+    }
+
+    @keyframes bigFishFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+
+    /* Fish accessories */
+    .fish-accessory {
+      position: absolute;
+      opacity: 0;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .fish-accessory.visible {
+      opacity: 1;
+    }
+
+    .cowboy-hat {
+      top: -5px; /* Positioned to overlap with fish's back, sitting on it */
+      left: 28px; /* Centered on the highest part of the fish's back */
+      width: var(--fib-5); /* 55px */
+      height: var(--fib-4); /* 34px */
+      transform: scale(0);
+    }
+
+    .cowboy-hat.visible {
+      transform: scale(1);
+    }
+
+    .cowboy-hat svg {
+      width: 100%;
+      height: 100%;
+      stroke: var(--pearl-white);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .snail-icon {
+      top: 50%;
+      left: calc(var(--fib-5) * -1); /* -55px - same distance as movie tickets */
+      transform: translateY(-50%) scale(0.5);
+      height: var(--fib-5); /* 55px - Fibonacci proportion */
+      width: auto;
+    }
+
+    .snail-icon.visible {
+      transform: translateY(-50%) scale(1);
+    }
+
+    .snail-icon svg {
+      height: 100%;
+      width: auto;
+      stroke: var(--teal-soft);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .movie-tickets {
+      top: 50%;
+      right: calc(var(--fib-5) * -1); /* -55px */
+      transform: translateY(-50%) scale(0.5);
+      width: var(--fib-5); /* 55px - Fibonacci proportion */
+      height: var(--fib-5); /* 55px */
+    }
+
+    .movie-tickets.visible {
+      transform: translateY(-50%) scale(1);
+    }
+
+    .movie-tickets svg {
+      width: 100%;
+      height: 100%;
+      stroke: var(--teal-soft);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    /* Scratch boxes */
+    .scratch-boxes {
+      display: flex;
+      gap: var(--fib-3);
+      margin-top: var(--fib-4);
+    }
+
+    .scratch-box {
+      width: 89px;
+      height: 55px;
+      border: 2px dashed rgba(255,255,255,0.4);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .scratch-label {
+      font-size: 9px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .scratch-cover {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        45deg,
+        rgba(255,255,255,0.1) 0px,
+        rgba(255,255,255,0.1) 2px,
+        transparent 2px,
+        transparent 6px
+      );
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .scratch-box.revealed .scratch-cover {
+      opacity: 0;
+      transform: scale(1.2);
+    }
+
+    .scratch-value {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--teal-glow);
+      opacity: 0;
+      transition: opacity 0.4s ease 0.3s;
+      text-align: center;
+      line-height: 1.2;
+      padding: 0 4px;
+    }
+
+    .scratch-box.revealed .scratch-value {
+      opacity: 1;
+    }
+
+    /* Firework animation */
+    .firework {
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .firework-particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--teal-glow);
+      animation: fireworkBurst 0.8s ease-out forwards;
+    }
+
+    @keyframes fireworkBurst {
+      0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(var(--x), var(--y)) scale(0);
+        opacity: 0;
+      }
+    }
+
+    /* Section title */
+    .section-subtitle {
+      font-size: var(--font-size-lg);
+      color: var(--text-secondary);
+      text-align: center;
+      margin-bottom: var(--fib-5);
+      grid-column: 1 / -1;
+    }
+
+    .section-subtitle span {
+      color: var(--teal-glow);
+    }
+
+    /* ============================================
+       SKIP BUTTON
+       ============================================ */
+    .skip-intro {
+      position: fixed;
+      bottom: var(--fib-4);
+      right: var(--fib-4);
+      z-index: 200;
+      padding: var(--fib-2) var(--fib-3);
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: var(--fib-3);
+      font-family: var(--font-family);
+      font-size: var(--font-size-xs);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .skip-intro:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: var(--pearl-white);
+    }
+
+    .skip-intro.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* ============================================
+       RESPONSIVE DESIGN
+       ============================================ */
+    @media (max-width: 968px) {
+      .hero {
+        grid-template-columns: 1fr;
+        text-align: center;
+        padding: var(--fib-5);
+        padding-top: var(--fib-7);
+      }
+
+      .hero-content {
+        padding-left: 0;
+        order: 1;
+      }
+
+      .hero-content.visible {
+        transform: translateY(0);
+      }
+
+      .hero-content {
+        transform: translateY(40px);
+      }
+
+      .hero-fish-container {
+        order: 0;
+        margin-bottom: var(--fib-5);
+      }
+
+      .hero-fish-container.final-position {
+        position: relative;
+      }
+
+      .brand-name {
+        font-size: var(--font-size-2xl);
+      }
+
+      .tagline {
+        font-size: var(--font-size-lg);
+      }
+
+      .value-props {
+        align-items: center;
+      }
+
+      .signup-form {
+        flex-direction: column;
+      }
+
+      .signup-section {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+
+      .match-stack-container {
+        height: 380px;
+        margin-top: var(--fib-5);
+      }
+
+      .match-card {
+        width: 180px;
+        height: 300px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .brand-name {
+        font-size: var(--font-size-xl);
+      }
+
+      .hero-fish svg {
+        width: 60px;
+      }
+
+      .signup-title {
+        font-size: var(--font-size-xl);
+      }
+
+      footer {
+        flex-direction: column;
+        gap: var(--fib-3);
+        text-align: center;
+      }
+
+      .learn-more-section {
+        grid-template-columns: 1fr;
+        padding: var(--fib-5);
+      }
+
+      .phone-mockup {
+        width: 240px;
+        height: 480px;
+      }
+
+      .big-fish svg {
+        width: 150px;
+      }
+
+      .scratch-boxes {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .bobbers-container {
+        gap: var(--fib-5);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Skip Button -->
+  <button class="skip-intro" id="skipBtn">Skip Intro →</button>
+
+  <!-- Intro Overlay (fades out) -->
+  <div class="intro-overlay" id="introOverlay"></div>
+  
+  <!-- Intro Label -->
+  <div class="intro-label" id="introLabel">Other Dating Apps</div>
+  
+  <!-- School of Chaotic Fish -->
+  <div class="fish-school" id="fishSchool"></div>
+
+  <!-- Main Page (always present, content animates in) -->
+  <main>
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-content" id="heroContent">
+        <div class="logo-container">
+          <svg viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 10 25 Q 30 5, 70 25 Q 30 45, 10 25 M 75 25 L 95 15 M 75 25 L 95 35" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="25" cy="22" r="4" stroke-width="2"/>
+          </svg>
+        </div>
+        <h1 class="brand-name">OneAtATime</h1>
+        <p class="tagline">The dating app built for <span>introverts</span>.</p>
+        <div class="value-props">
+          <div class="value-prop" id="prop1">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>One match at a time. No overwhelming choices.</span>
+          </div>
+          <div class="value-prop" id="prop2">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Deeper conversations reveal more about each other.</span>
+          </div>
+          <div class="value-prop" id="prop3">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Quality over quantity. Always.</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Fish Container - starts centered, moves to right column -->
+      <div class="hero-fish-container" id="fishContainer">
+        <div class="conversation-label" id="conversationLabel">OneAtATime</div>
+        <div class="hero-fish-conversation" id="fishConversation">
+          <div class="hero-fish-pair">
+            <div class="hero-fish">
+              <div class="hero-bubble" id="bubble1">What book changed your life?</div>
+              <svg viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 10 25 Q 30 5, 70 25 Q 30 45, 10 25 M 75 25 L 95 15 M 75 25 L 95 35" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="25" cy="22" r="4" stroke-width="2"/>
+              </svg>
+            </div>
+            <div class="hero-fish">
+              <div class="hero-bubble" id="bubble2">"Man's Search for Meaning" — it's about finding purpose anywhere.</div>
+              <svg viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 10 25 Q 30 5, 70 25 Q 30 45, 10 25 M 75 25 L 95 15 M 75 25 L 95 35" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="25" cy="22" r="4" stroke-width="2"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Bobbers -->
+      <div class="bobbers-container" id="bobbersContainer">
+        <div class="bobber-wrapper" onclick="document.getElementById('learnMore').scrollIntoView({behavior: 'smooth'})">
+          <span class="bobber-label">Learn More</span>
+          <div class="bobber">
+            <div class="bobber-top"></div>
+            <div class="bobber-body"></div>
+          </div>
+          <div class="fishing-line"></div>
+        </div>
+        
+        <div class="bobber-wrapper" onclick="document.getElementById('signupSection').scrollIntoView({behavior: 'smooth'})">
+          <span class="bobber-label">Sign Up</span>
+          <div class="bobber">
+            <div class="bobber-top"></div>
+            <div class="bobber-body"></div>
+          </div>
+          <div class="fishing-line"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Wave Separator -->
+    <div class="wave-separator">
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Back wave -->
+        <path class="wave-back" d="M0,60 C180,120 360,0 540,60 C720,120 900,0 1080,60 C1260,120 1440,60 1440,60 L1440,120 L0,120 Z"/>
+        <!-- Middle wave (teal glow) -->
+        <path class="wave-mid" d="M0,80 C240,20 480,100 720,60 C960,20 1200,100 1440,80 L1440,120 L0,120 Z"/>
+        <!-- Front wave -->
+        <path class="wave-front" d="M0,90 C360,120 720,60 1080,90 C1260,105 1350,100 1440,95 L1440,120 L0,120 Z"/>
+      </svg>
+    </div>
+
+    <!-- Learn More Section -->
+    <section class="learn-more-section" id="learnMore">
+      <p class="section-subtitle">The more you chat, the more you <span>discover</span></p>
+      
+      <!-- Phone with Chat -->
+      <div class="phone-container">
+        <div class="phone-mockup">
+          <div class="phone-screen">
+            <div class="chat-header">
+              <div class="chat-avatar">
+                <svg viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M 10 25 Q 30 5, 70 25 Q 30 45, 10 25 M 75 25 L 95 15 M 75 25 L 95 35" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="25" cy="22" r="4" stroke-width="2"/>
+                </svg>
+              </div>
+              <span class="chat-name">Sunny Fins</span>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+              <!-- Messages will be added by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Fish Profile -->
+      <div class="fish-profile-container">
+        <div class="big-fish" id="bigFish">
+          <!-- Cowboy hat accessory -->
+          <div class="fish-accessory cowboy-hat" id="cowboyHat">
+            <svg viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg">
+              <!-- Wide brim -->
+              <ellipse cx="30" cy="35" rx="28" ry="5" stroke-linecap="round"/>
+              <!-- Hat crown -->
+              <path d="M 12 35 L 15 18 Q 18 12, 30 12 Q 42 12, 45 18 L 48 35" stroke-linecap="round" stroke-linejoin="round"/>
+              <!-- Crown top indent -->
+              <path d="M 18 18 Q 30 22, 42 18" stroke-linecap="round"/>
+              <!-- Brim curve up on sides -->
+              <path d="M 2 33 Q 8 28, 15 35" stroke-linecap="round"/>
+              <path d="M 58 33 Q 52 28, 45 35" stroke-linecap="round"/>
+            </svg>
+          </div>
+          
+          <!-- Snail icon -->
+          <div class="fish-accessory snail-icon" id="snailIcon">
+            <svg viewBox="0 0 50 40" xmlns="http://www.w3.org/2000/svg">
+              <!-- Shell spiral -->
+              <circle cx="30" cy="18" r="12"/>
+              <path d="M 30 18 Q 36 18, 36 12 Q 36 8, 30 8 Q 26 8, 26 12" stroke-linecap="round"/>
+              <!-- Body -->
+              <path d="M 18 30 Q 8 30, 5 28 Q 2 26, 5 24 Q 10 22, 18 22 Q 22 22, 24 24 Q 26 26, 24 28 Q 22 30, 18 30" stroke-linecap="round" stroke-linejoin="round"/>
+              <!-- Eye stalks -->
+              <line x1="8" y1="24" x2="6" y2="18" stroke-linecap="round"/>
+              <line x1="12" y1="24" x2="11" y2="19" stroke-linecap="round"/>
+              <!-- Eyes -->
+              <circle cx="6" cy="17" r="1.5"/>
+              <circle cx="11" cy="18" r="1.5"/>
+            </svg>
+          </div>
+          
+          <!-- Movie tickets -->
+          <div class="fish-accessory movie-tickets" id="movieTickets">
+            <svg viewBox="0 0 45 55" xmlns="http://www.w3.org/2000/svg">
+              <!-- Back ticket (slight tilt) -->
+              <g transform="rotate(-5, 22, 27)">
+                <!-- Ticket body with notches -->
+                <path d="M 2 8 L 2 4 Q 2 2, 4 2 L 18 2 Q 20 2, 20 4 L 20 8 
+                         Q 18 8, 18 10 Q 18 12, 20 12 L 20 38 
+                         Q 18 38, 18 40 Q 18 42, 20 42 L 20 46 Q 20 48, 18 48 L 4 48 Q 2 48, 2 46 L 2 42
+                         Q 4 42, 4 40 Q 4 38, 2 38 L 2 12
+                         Q 4 12, 4 10 Q 4 8, 2 8 Z" stroke-linejoin="round"/>
+                <!-- Tear line -->
+                <line x1="2" y1="38" x2="20" y2="38" stroke-dasharray="2,2"/>
+                <!-- Clownfish (Nemo) -->
+                <g transform="translate(6, 15)">
+                  <ellipse cx="5" cy="5" rx="4.5" ry="3"/>
+                  <path d="M 9 5 L 11 3 L 11 7 Z"/>
+                  <line x1="2" y1="2.5" x2="2" y2="7.5"/>
+                  <line x1="6" y1="2.5" x2="6" y2="7.5"/>
+                  <circle cx="3.5" cy="4.5" r="0.8"/>
+                </g>
+              </g>
+              <!-- Front ticket (slight opposite tilt) -->
+              <g transform="rotate(5, 22, 27)">
+                <!-- Ticket body with notches -->
+                <path d="M 23 8 L 23 4 Q 23 2, 25 2 L 39 2 Q 41 2, 41 4 L 41 8 
+                         Q 39 8, 39 10 Q 39 12, 41 12 L 41 38 
+                         Q 39 38, 39 40 Q 39 42, 41 42 L 41 46 Q 41 48, 39 48 L 25 48 Q 23 48, 23 46 L 23 42
+                         Q 25 42, 25 40 Q 25 38, 23 38 L 23 12
+                         Q 25 12, 25 10 Q 25 8, 23 8 Z" stroke-linejoin="round"/>
+                <!-- Tear line -->
+                <line x1="23" y1="38" x2="41" y2="38" stroke-dasharray="2,2"/>
+                <!-- Clownfish (Nemo) -->
+                <g transform="translate(27, 15)">
+                  <ellipse cx="5" cy="5" rx="4.5" ry="3"/>
+                  <path d="M 9 5 L 11 3 L 11 7 Z"/>
+                  <line x1="2" y1="2.5" x2="2" y2="7.5"/>
+                  <line x1="6" y1="2.5" x2="6" y2="7.5"/>
+                  <circle cx="3.5" cy="4.5" r="0.8"/>
+                </g>
+              </g>
+            </svg>
+          </div>
+          
+          <!-- The big fish -->
+          <svg viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 10 25 Q 30 5, 70 25 Q 30 45, 10 25 M 75 25 L 95 15 M 75 25 L 95 35" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="25" cy="22" r="4" stroke-width="1.5"/>
+          </svg>
+        </div>
+        
+        <!-- Scratch boxes -->
+        <div class="scratch-boxes">
+          <div class="scratch-box" id="politicsBox">
+            <span class="scratch-label">Hobbies</span>
+            <span class="scratch-value">Cowboy</span>
+            <div class="scratch-cover"></div>
+          </div>
+          <div class="scratch-box" id="religionBox">
+            <span class="scratch-label">Pets</span>
+            <span class="scratch-value">Snail</span>
+            <div class="scratch-cover"></div>
+          </div>
+          <div class="scratch-box" id="sexualityBox">
+            <span class="scratch-label">First Date</span>
+            <span class="scratch-value">Movie</span>
+            <div class="scratch-cover"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sign Up Section -->
+    <section class="signup-section" id="signupSection">
+      <div class="signup-content">
+        <div class="pearl-offer">
+          <div class="pearls">
+            <div class="pearl"></div>
+            <div class="pearl"></div>
+            <div class="pearl"></div>
+          </div>
+          <span class="pearl-text">Get 3 Free Pearls</span>
+        </div>
+        
+        <h2 class="signup-title">Be First in the Water</h2>
+        <p class="signup-subtitle">Sign up for early access and receive 3 free pearls — boost your visibility when we launch.</p>
+        
+        <form class="signup-form" id="signupForm">
+          <input type="email" class="email-input" placeholder="Enter your email" required>
+          <button type="submit" class="submit-btn">Join Waitlist</button>
+        </form>
+        
+        <p class="privacy-note">No spam, ever. We respect your inbox like we respect your time.</p>
+      </div>
+
+      <!-- Profile Card Stack -->
+      <div class="match-stack-container" id="matchStack">
+        <div class="match-card">
+          <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=500&fit=crop&crop=face" alt="Profile" class="profile-photo">
+          <div class="profile-info">
+            <span class="profile-name">Sarah</span>
+            <span class="profile-age">28</span>
+            <svg class="verified-badge" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="match-card">
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop&crop=face" alt="Profile" class="profile-photo">
+          <div class="profile-info">
+            <span class="profile-name">James</span>
+            <span class="profile-age">31</span>
+            <svg class="verified-badge" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="match-card">
+          <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=500&fit=crop&crop=face" alt="Profile" class="profile-photo">
+          <div class="profile-info">
+            <span class="profile-name">Emma</span>
+            <span class="profile-age">26</span>
+            <svg class="verified-badge" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="match-card">
+          <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=500&fit=crop&crop=face" alt="Profile" class="profile-photo">
+          <div class="profile-info">
+            <span class="profile-name">Michael</span>
+            <span class="profile-age">29</span>
+            <svg class="verified-badge" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="footer">
+      <div class="footer-logo">
+        <svg viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">
+          <path d="M 10 25 Q 30 5, 70 25 Q 30 45, 10 25 M 75 25 L 95 15 M 75 25 L 95 35" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="25" cy="22" r="4" stroke-width="2"/>
+        </svg>
+        <span>OneAtATime</span>
+      </div>
+      <p class="footer-text">© 2026 OneAtATime. Finding your person, not your options.</p>
+    </footer>
+  </main>
+
+  <script>
+    // ============================================
+    // ANIMATION CONFIGURATION
+    // ============================================
+    
+    const chaoticMessages = [
+      "Hey", "Hi there!", "What's up?", "U up?", "Hey cutie 😏",
+      "Nice pics!", "Sup", "How's it going?", "Hey beautiful",
+      "Hi! How are you?", "What are you up to?", "Netflix and chill?",
+      "Hey there 👋", "You're cute", "Hi gorgeous", "Wanna chat?",
+      "Hey! Matched!", "What's your snap?", "Hey sexy", "Hello!",
+      "You seem cool", "Nice smile!", "Hey babe", "What's good?",
+      "DTF?", "You're hot", "Hey stranger", "Come here often? 😂",
+      "Love your profile", "Hey you", "Hiii", "Thoughts on pineapple pizza?",
+      "Do you like tacos?", "Are you real?", "Message me!", "Let's hang",
+      "Coffee?", "Drinks?", "What are you looking for?", "New here?",
+      "Just saying hi!", "You caught my eye", "Swipe right was worth it",
+      "Finally a real person", "Are you a bot?", "Heyyyy", "Yo!"
+    ];
+
+     // Meaningful conversations between the two fish
+     const conversations = [
+       {
+         fish1: "What book changed your life?",
+         fish2: "\"Man's Search for Meaning\" — it's about finding purpose anywhere."
+       },
+       {
+         fish1: "What's your favorite trail?",
+         fish2: "Cascade Loop at sunrise. When the fog lifts... magical ✨"
+       },
+       {
+         fish1: "Any surprising hobbies?",
+         fish2: "I restore vintage typewriters! It's oddly meditative."
+       },
+       {
+         fish1: "Dinner with anyone — who?",
+         fish2: "My grandmother. So many questions I never asked."
+       },
+       {
+         fish1: "Small things that bring you joy?",
+         fish2: "Rain on hot pavement. And a perfect avocado 🥑"
+       },
+       {
+         fish1: "What's your love language?",
+         fish2: "Quality time. A quiet evening together beats everything."
+       },
+       {
+         fish1: "What are you looking for?",
+         fish2: "Someone who makes ordinary moments special."
+       },
+       {
+         fish1: "Best gift you've received?",
+         fish2: "A handwritten letter. I still read it when I'm down."
+       }
+     ];
+
+    let currentConversationIndex = 0;
+    let conversationInterval = null;
+
+    // DOM Elements
+    const fishSchool = document.getElementById('fishSchool');
+    const introOverlay = document.getElementById('introOverlay');
+    const introLabel = document.getElementById('introLabel');
+    const fishContainer = document.getElementById('fishContainer');
+    const fishConversation = document.getElementById('fishConversation');
+    const heroContent = document.getElementById('heroContent');
+    const signupSection = document.getElementById('signupSection');
+    const footer = document.getElementById('footer');
+    const skipBtn = document.getElementById('skipBtn');
+    const conversationLabel = document.getElementById('conversationLabel');
+    const bubble1 = document.getElementById('bubble1');
+    const bubble2 = document.getElementById('bubble2');
+    const prop1 = document.getElementById('prop1');
+    const prop2 = document.getElementById('prop2');
+    const prop3 = document.getElementById('prop3');
+    const bobbersContainer = document.getElementById('bobbersContainer');
+
+    // Create chaotic fish
+    function createChaoticFish() {
+      const fishCount = 100;
+      const bubbleChance = 0.30; // 30% of fish get speech bubbles
+      
+      for (let i = 0; i < fishCount; i++) {
+        const fish = document.createElement('div');
+        
+        const swimRight = Math.random() > 0.5;
+        const top = Math.random() * 85 + 5;
+        const duration = Math.random() * 5 + 4;
+        // Some fish start with negative delay so they're already on screen
+        const startOnScreen = i < 25; // First 25 fish start mid-animation
+        const delay = startOnScreen 
+          ? -(Math.random() * duration * 0.7 + duration * 0.15) // Start 15-85% through animation
+          : Math.random() * 5;
+        const size = Math.random() * 25 + 20;
+        const hasBubble = Math.random() < bubbleChance;
+        
+        fish.className = `chaotic-fish ${swimRight ? 'swim-right' : 'swim-left'}`;
+        
+        fish.style.cssText = `
+          --swim-duration: ${duration}s;
+          --swim-delay: ${delay}s;
+          --fish-size: ${size}px;
+          top: ${top}%;
+          left: 0;
+        `;
+        
+        // Base fish SVG
+        const fishSvg = `
+          <svg viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 10 25 Q 30 5, 70 25 Q 30 45, 10 25 M 75 25 L 95 15 M 75 25 L 95 35" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="25" cy="22" r="4" stroke-width="2"/>
+          </svg>
+        `;
+        
+        if (hasBubble) {
+          const message = chaoticMessages[Math.floor(Math.random() * chaoticMessages.length)];
+          const bubbleDuration = Math.random() * 2 + 2.5; // 2.5-4.5 seconds
+          const bubbleDelay = Math.random() * 5; // Random start time
+          
+          fish.innerHTML = `
+            <div class="message" style="--bubble-duration: ${bubbleDuration}s; --bubble-delay: ${bubbleDelay}s;">${message}</div>
+            ${fishSvg}
+          `;
+        } else {
+          fish.innerHTML = fishSvg;
+        }
+        
+        fishSchool.appendChild(fish);
+      }
+    }
+
+    // Calculate where the fish should end up in the grid
+    function getTargetPosition() {
+      // Temporarily make the container relative to measure where it should be
+      const hero = document.querySelector('.hero');
+      const heroRect = hero.getBoundingClientRect();
+      const gap = 89; // --fib-6
+      const padding = 89; // --fib-6
+      
+      // Calculate right column center (grid is 1fr 1fr with gap)
+      const columnWidth = (heroRect.width - gap - (padding * 2)) / 2;
+      const rightColumnLeft = heroRect.left + padding + columnWidth + gap;
+      const rightColumnCenter = rightColumnLeft + (columnWidth / 2);
+      const verticalCenter = heroRect.top + (heroRect.height / 2);
+      
+      return {
+        left: rightColumnCenter,
+        top: verticalCenter
+      };
+    }
+
+    // Animation timeline
+    function runAnimation() {
+      createChaoticFish();
+      
+      // Show intro label immediately
+      setTimeout(() => {
+        introLabel.classList.add('visible');
+      }, 500);
+      
+      // Phase 1: Chaotic fish swarm (0-5s)
+      // Fish are already animating via CSS
+      
+      // Phase 2: Fade out chaos, show calm fish (5s)
+      setTimeout(() => {
+        // Fade out chaotic elements
+        fishSchool.classList.add('fade-out');
+        introLabel.classList.add('fade-out');
+        
+        // Show the calm fish conversation (starts large and centered)
+        fishConversation.classList.add('visible');
+        
+        // Start floating animation immediately when fish appear
+        fishConversation.classList.add('animate-float');
+        
+        // Show bubbles one at a time
+        setTimeout(() => {
+          bubble1.classList.add('visible');
+        }, 600);
+        
+        setTimeout(() => {
+          bubble2.classList.add('visible');
+          
+          // Start conversation cycling after both bubbles are visible
+          setTimeout(() => {
+            startConversationCycle();
+          }, 1000);
+        }, 1400);
+        
+        // Show "OneAtATime" label above fish
+        setTimeout(() => {
+          conversationLabel.classList.add('visible');
+        }, 2000);
+      }, 5000);
+      
+      // Phase 3: Transition to final layout (9s)
+      setTimeout(() => {
+        // Fade out the background overlay
+        introOverlay.classList.add('fade-out');
+        
+        // Hide the floating label (brand name will appear on left)
+        conversationLabel.classList.add('fade-out');
+        
+        // Calculate target position BEFORE animating
+        const target = getTargetPosition();
+        
+        // Shrink fish to final size
+        fishConversation.classList.add('final-size');
+        
+        // Animate fish container to target position (stays fixed during animation)
+        fishContainer.style.top = target.top + 'px';
+        fishContainer.style.left = target.left + 'px';
+        fishContainer.style.transform = 'translate(-50%, -50%)'; // Keep centered on target point
+        
+        // After animation completes, switch to relative positioning
+        // (floating animation and conversation cycling already started in Phase 2)
+        setTimeout(() => {
+          fishContainer.classList.add('final-position');
+        }, 1500);
+        
+        // Slide in hero content from left
+        setTimeout(() => {
+          heroContent.classList.add('visible');
+        }, 300);
+        
+        // Stagger in value props
+        setTimeout(() => prop1.classList.add('visible'), 800);
+        setTimeout(() => prop2.classList.add('visible'), 1000);
+        setTimeout(() => prop3.classList.add('visible'), 1200);
+        
+        // Show signup section
+        setTimeout(() => {
+          signupSection.classList.add('visible');
+        }, 1400);
+        
+        // Show footer and bobbers
+        setTimeout(() => {
+          footer.classList.add('visible');
+          bobbersContainer.classList.add('visible');
+        }, 1600);
+        
+        // Hide skip button
+        skipBtn.classList.add('hidden');
+      }, 9000);
+    }
+
+    // Skip functionality - jump to final state
+    function skipIntro() {
+      // Hide all intro elements immediately
+      introOverlay.style.transition = 'opacity 0.3s ease-out';
+      fishSchool.style.transition = 'opacity 0.3s ease-out';
+      introOverlay.classList.add('fade-out');
+      fishSchool.classList.add('fade-out');
+      introLabel.classList.add('fade-out');
+      conversationLabel.classList.add('fade-out');
+      
+      // Set fish to final state (skip animation)
+      fishContainer.style.transition = 'none';
+      fishConversation.style.transition = 'none';
+      fishConversation.classList.add('visible');
+      fishConversation.classList.add('final-size');
+      fishContainer.classList.add('final-position');
+      fishConversation.classList.add('animate-float');
+      bubble1.classList.add('visible');
+      bubble2.classList.add('visible');
+      
+      // Start conversation cycling
+      startConversationCycle();
+      
+      // Show all content immediately
+      heroContent.style.transition = 'opacity 0.3s ease-out';
+      heroContent.classList.add('visible');
+      prop1.classList.add('visible');
+      prop2.classList.add('visible');
+      prop3.classList.add('visible');
+      signupSection.classList.add('visible');
+      footer.classList.add('visible');
+      bobbersContainer.classList.add('visible');
+      
+      // Hide skip button
+      skipBtn.classList.add('hidden');
+    }
+
+    skipBtn.addEventListener('click', skipIntro);
+
+    // Cycle through conversations with smooth fade transitions
+    function updateConversation() {
+      const conv = conversations[currentConversationIndex];
+      
+      // Phase 1: Fade out both bubbles
+      bubble1.style.opacity = '0';
+      bubble2.style.opacity = '0';
+      
+      // Phase 2: After fade completes, swap text and fade back in
+      setTimeout(() => {
+        bubble1.textContent = conv.fish1;
+        bubble2.textContent = conv.fish2;
+      }, 500);
+      
+      // Phase 3: Fade in with stagger
+      setTimeout(() => {
+        bubble1.style.opacity = '1';
+      }, 550);
+      
+      setTimeout(() => {
+        bubble2.style.opacity = '1';
+      }, 850);
+      
+      // Move to next conversation
+      currentConversationIndex = (currentConversationIndex + 1) % conversations.length;
+    }
+
+    function startConversationCycle() {
+      // Start from index 1 since index 0 is already showing from the HTML
+      currentConversationIndex = 1;
+      
+      // Start cycling every 7 seconds (extra time for fade animations)
+      conversationInterval = setInterval(updateConversation, 7000);
+    }
+
+    // Form submission
+    document.getElementById('signupForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const email = this.querySelector('input').value;
+      
+      // Show success state
+      const btn = this.querySelector('button');
+      const originalText = btn.textContent;
+      btn.textContent = '✓ You\'re on the list!';
+      btn.style.background = 'var(--teal-soft)';
+      
+      setTimeout(() => {
+        btn.textContent = originalText;
+        btn.style.background = '';
+        this.querySelector('input').value = '';
+      }, 3000);
+      
+      console.log('Email submitted:', email);
+      // TODO: Connect to actual email collection service
+    });
+
+    // Start animation on load
+    window.addEventListener('load', runAnimation);
+
+    // ============================================
+    // MATCH CARD STACK ANIMATION
+    // ============================================
+    
+    const profiles = [
+      { name: 'Sarah', age: 28, img: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=500&fit=crop&crop=face' },
+      { name: 'James', age: 31, img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop&crop=face' },
+      { name: 'Emma', age: 26, img: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=500&fit=crop&crop=face' },
+      { name: 'Michael', age: 29, img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=500&fit=crop&crop=face' },
+      { name: 'Olivia', age: 27, img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=500&fit=crop&crop=face' },
+      { name: 'Sophie', age: 25, img: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=500&fit=crop&crop=face' },
+      { name: 'Alex', age: 30, img: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=500&fit=crop&crop=face' },
+    ];
+
+    let currentProfileIndex = 4; // Start after the initial 4 cards
+
+    function cycleMatchCards() {
+      const stack = document.getElementById('matchStack');
+      if (!stack) return;
+      
+      const cards = stack.querySelectorAll('.match-card');
+      if (cards.length === 0) return;
+
+      // Get the top card and animate it out
+      const topCard = cards[0];
+      topCard.classList.add('slide-up');
+
+      // After animation, move it to back and update content
+      setTimeout(() => {
+        topCard.classList.remove('slide-up');
+        stack.appendChild(topCard);
+
+        // Update with new profile data
+        const profile = profiles[currentProfileIndex % profiles.length];
+        const photo = topCard.querySelector('.profile-photo');
+        const nameEl = topCard.querySelector('.profile-name');
+        const ageEl = topCard.querySelector('.profile-age');
+        
+        photo.src = profile.img;
+        nameEl.textContent = profile.name;
+        ageEl.textContent = profile.age;
+
+        currentProfileIndex++;
+
+        // Reorder z-index and transforms (horizontal stack - left to right)
+        const updatedCards = stack.querySelectorAll('.match-card');
+        updatedCards.forEach((card, index) => {
+          card.style.zIndex = 5 - index;
+          if (index === 0) {
+            card.style.transform = 'translateX(0) translateY(0) scale(1)';
+            card.style.opacity = '1';
+          } else if (index === 1) {
+            card.style.transform = 'translateX(-20px) translateY(0) scale(0.95)';
+            card.style.opacity = '0.8';
+          } else if (index === 2) {
+            card.style.transform = 'translateX(-40px) translateY(0) scale(0.9)';
+            card.style.opacity = '0.6';
+          } else if (index === 3) {
+            card.style.transform = 'translateX(-60px) translateY(0) scale(0.85)';
+            card.style.opacity = '0.4';
+          }
+        });
+      }, 600);
+    }
+
+    // Start cycling cards every 3 seconds
+    setInterval(cycleMatchCards, 3000);
+
+    // ============================================
+    // LEARN MORE SECTION - Chat & Reveal Animation
+    // ============================================
+    
+    const chatMessagesData = [
+      { type: 'received', text: "Hey there! 🐟 What's your favorite bait?" },
+      { type: 'sent', text: "Definitely worms! Classic but effective 😄" },
+      { type: 'received', text: "Nice choice! Where do you like to swim?" },
+      { type: 'sent', text: "There's this quiet pond near the reeds... so peaceful" },
+      { type: 'received', text: "Sounds dreamy ✨ What's on your bucket list?" },
+      { type: 'sent', text: "Swimming upstream at least once! You?" },
+      { type: 'received', text: "Finding the perfect coral to call home 🪸" },
+      { type: 'sent', text: "That's beautiful. What makes you feel alive?" },
+      { type: 'received', text: "Stargazing from just below the surface at night" },
+      { type: 'sent', text: "We should do that together sometime..." },
+    ];
+
+    const reveals = [
+      { msgIndex: 2, action: () => { revealBox('politicsBox'); document.getElementById('cowboyHat').classList.add('visible'); }},
+      { msgIndex: 4, action: () => { revealBox('religionBox'); document.getElementById('snailIcon').classList.add('visible'); }},
+      { msgIndex: 6, action: () => { revealBox('sexualityBox'); document.getElementById('movieTickets').classList.add('visible'); }},
+    ];
+
+    let chatMessageIndex = 0;
+    let chatAnimationStarted = false;
+
+    function revealBox(boxId) {
+      const box = document.getElementById(boxId);
+      box.classList.add('revealed');
+      createFirework(box);
+    }
+
+    function createFirework(element) {
+      const rect = element.getBoundingClientRect();
+      const firework = document.createElement('div');
+      firework.className = 'firework';
+      firework.style.left = rect.left + rect.width / 2 + 'px';
+      firework.style.top = rect.top + rect.height / 2 + 'px';
+      firework.style.position = 'fixed';
+      
+      const colors = ['#00d4aa', '#4ecdc4', '#ff6b6b', '#ffd93d', '#6bcb77'];
+      
+      for (let i = 0; i < 12; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'firework-particle';
+        const angle = (i / 12) * Math.PI * 2;
+        const distance = 30 + Math.random() * 20;
+        particle.style.setProperty('--x', Math.cos(angle) * distance + 'px');
+        particle.style.setProperty('--y', Math.sin(angle) * distance + 'px');
+        particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+        firework.appendChild(particle);
+      }
+      
+      document.body.appendChild(firework);
+      setTimeout(() => firework.remove(), 1000);
+    }
+
+    function addChatMessage() {
+      if (chatMessageIndex >= chatMessagesData.length) {
+        // Stop at the end - don't reset
+        return;
+      }
+
+      const msg = chatMessagesData[chatMessageIndex];
+      const chatContainer = document.getElementById('chatMessages');
+      
+      const msgEl = document.createElement('div');
+      msgEl.className = `chat-msg ${msg.type}`;
+      msgEl.textContent = msg.text;
+      chatContainer.appendChild(msgEl);
+      
+      // Scroll to bottom
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+      
+      // Animate in
+      setTimeout(() => msgEl.classList.add('visible'), 50);
+      
+      // Check for reveals
+      reveals.forEach(reveal => {
+        if (reveal.msgIndex === chatMessageIndex) {
+          setTimeout(reveal.action, 500);
+        }
+      });
+      
+      chatMessageIndex++;
+      
+      // Next message
+      const delay = 1500 + Math.random() * 1000;
+      setTimeout(addChatMessage, delay);
+    }
+
+    // Start chat animation when Learn More section is visible
+    function checkLearnMoreVisibility() {
+      const section = document.getElementById('learnMore');
+      if (!section) return;
+      
+      const rect = section.getBoundingClientRect();
+      const isVisible = rect.top < window.innerHeight * 0.8;
+      
+      if (isVisible && !chatAnimationStarted) {
+        chatAnimationStarted = true;
+        setTimeout(addChatMessage, 500);
+      }
+    }
+
+    window.addEventListener('scroll', checkLearnMoreVisibility);
+    // Also check on load in case user refreshes while scrolled down
+    setTimeout(checkLearnMoreVisibility, 1000);
+  </script>
+</body>
+</html>
