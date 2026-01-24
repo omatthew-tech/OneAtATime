@@ -309,7 +309,7 @@
     }
 
     /* ============================================
-       HERO CONTENT (Slides in from left on desktop)
+       HERO CONTENT (Slides in from left)
        ============================================ */
     .hero-content {
       z-index: 1;
@@ -322,15 +322,6 @@
     .hero-content.visible {
       opacity: 1;
       transform: translateX(0);
-    }
-
-    /* Mobile: Only fade in, no transform */
-    @media (max-width: 968px) {
-      .hero-content {
-        opacity: 0;
-        transform: none !important;
-        transition: opacity 1.2s ease-out !important;
-      }
     }
 
     .logo-container {
@@ -404,7 +395,7 @@
     }
 
     /* ============================================
-       FISH CONVERSATION (Animates from center to right on desktop, up on mobile)
+       FISH CONVERSATION (Animates from center to right)
        ============================================ */
     .hero-fish-container {
       position: fixed;
@@ -417,8 +408,7 @@
       z-index: 102;
       transition: top 1.5s cubic-bezier(0.4, 0, 0.2, 1),
                   left 1.5s cubic-bezier(0.4, 0, 0.2, 1),
-                  transform 1.5s cubic-bezier(0.4, 0, 0.2, 1),
-                  position 0s linear 1.5s; /* Delay position change until after animation */
+                  transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .hero-fish-container.final-position {
@@ -427,17 +417,6 @@
       left: auto !important;
       transform: none !important;
       transition: none;
-    }
-
-    /* Mobile: Smooth transition to final position */
-    @media (max-width: 968px) {
-      .hero-fish-container.final-position {
-        position: relative !important;
-        top: auto !important;
-        left: auto !important;
-        transform: none !important;
-        transition: none !important;
-      }
     }
 
     .hero-fish-conversation {
@@ -794,9 +773,6 @@
       font-weight: 700;
       margin-bottom: var(--fib-3);
       color: var(--pearl-white);
-      opacity: 0;
-      transform: translateY(20px);
-      animation: fadeInUp 0.8s ease-out 0.2s forwards;
     }
 
     .signup-subtitle {
@@ -804,33 +780,6 @@
       color: var(--text-secondary);
       margin-bottom: var(--fib-5);
       max-width: 600px;
-      opacity: 0;
-      transform: translateY(20px);
-      animation: fadeInUp 0.8s ease-out 0.4s forwards;
-    }
-
-    .signup-form {
-      opacity: 0;
-      transform: translateY(20px);
-      animation: fadeInUp 0.8s ease-out 0.6s forwards;
-    }
-
-    .privacy-note {
-      opacity: 0;
-      animation: fadeIn 0.8s ease-out 0.8s forwards;
-    }
-
-    @keyframes fadeInUp {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes fadeIn {
-      to {
-        opacity: 1;
-      }
     }
 
     .signup-form {
@@ -861,13 +810,6 @@
       border-color: var(--teal-glow);
       background: rgba(0, 212, 170, 0.05);
       box-shadow: 0 0 20px rgba(0, 212, 170, 0.2);
-      transform: translateY(-2px);
-      transition: all 0.3s ease;
-    }
-
-    .email-input:not(:placeholder-shown) {
-      border-color: var(--teal-soft);
-      background: rgba(0, 212, 170, 0.08);
     }
 
     .submit-btn {
@@ -886,42 +828,13 @@
       white-space: nowrap;
     }
 
-    .submit-btn {
-      position: relative;
-      overflow: hidden;
-    }
-
-    .submit-btn::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.3);
-      transform: translate(-50%, -50%);
-      transition: width 0.6s ease, height 0.6s ease;
-    }
-
     .submit-btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 25px rgba(0, 212, 170, 0.4);
     }
 
-    .submit-btn:hover::before {
-      width: 300px;
-      height: 300px;
-    }
-
     .submit-btn:active {
       transform: translateY(0);
-    }
-
-    .submit-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
     }
 
     .privacy-note {
@@ -1244,21 +1157,15 @@
     .big-fish {
       position: relative;
       animation: bigFishFloat 4s ease-in-out infinite;
-      /* Container matches SVG dimensions for accurate absolute positioning */
-      display: inline-block;
-      width: 200px; /* Desktop fish width - will be overridden in media queries */
-      height: 100px; /* Fish SVG aspect ratio is 2:1 (viewBox="0 0 100 50") */
-      line-height: 0; /* Remove inline spacing */
     }
 
     .big-fish svg {
-      width: 100%;
-      height: 100%;
+      width: 200px;
+      height: auto;
       stroke: var(--teal-glow);
       fill: none;
       stroke-width: 1.5;
       filter: drop-shadow(0 0 30px rgba(0, 212, 170, 0.3));
-      display: block;
     }
 
     @keyframes bigFishFloat {
@@ -1279,10 +1186,9 @@
 
     .cowboy-hat {
       top: -5px; /* Positioned to overlap with fish's back, sitting on it */
-      left: 14%; /* Centered on the highest part of the fish's back (28px / 200px = 14%) */
-      width: 27.5%; /* 55px / 200px = 27.5% - scales with fish width */
-      height: auto;
-      aspect-ratio: 60 / 40; /* Match viewBox="0 0 60 40" for accurate proportions */
+      left: 28px; /* Centered on the highest part of the fish's back */
+      width: var(--fib-5); /* 55px */
+      height: var(--fib-4); /* 34px */
       transform: scale(0);
     }
 
@@ -1300,11 +1206,10 @@
 
     .snail-icon {
       top: 50%;
-      left: -27.5%; /* -55px / 200px = -27.5% - scales with fish */
+      left: calc(var(--fib-5) * -1); /* -55px - same distance as movie tickets */
       transform: translateY(-50%) scale(0.5);
-      width: 27.5%; /* 55px / 200px = 27.5% - scales with fish WIDTH */
-      height: auto;
-      aspect-ratio: 50 / 40; /* Maintain snail proportions from viewBox */
+      height: var(--fib-5); /* 55px - Fibonacci proportion */
+      width: auto;
     }
 
     .snail-icon.visible {
@@ -1312,8 +1217,8 @@
     }
 
     .snail-icon svg {
-      width: 100%;
       height: 100%;
+      width: auto;
       stroke: var(--teal-soft);
       fill: none;
       stroke-width: 2;
@@ -1321,11 +1226,10 @@
 
     .movie-tickets {
       top: 50%;
-      right: -27.5%; /* -55px / 200px = -27.5% - scales with fish */
+      right: calc(var(--fib-5) * -1); /* -55px */
       transform: translateY(-50%) scale(0.5);
-      width: 27.5%; /* 55px / 200px = 27.5% - scales with fish WIDTH */
-      height: auto;
-      aspect-ratio: 45 / 55; /* Maintain ticket proportions from viewBox */
+      width: var(--fib-5); /* 55px - Fibonacci proportion */
+      height: var(--fib-5); /* 55px */
     }
 
     .movie-tickets.visible {
@@ -1476,124 +1380,48 @@
     }
 
     /* ============================================
-       RESPONSIVE DESIGN (Fibonacci-based spacing)
+       RESPONSIVE DESIGN
        ============================================ */
-    
-    /* Large Tablets */
-    @media (max-width: 1200px) {
-      .hero {
-        padding: var(--fib-5);
-        padding-bottom: calc(var(--fib-6) + var(--fib-5));
-        gap: var(--fib-4);
-      }
-
-      .brand-name {
-        font-size: var(--font-size-2xl);
-      }
-
-      .hero-fish svg {
-        width: 85px;
-      }
-
-      .hero-bubble {
-        width: 160px;
-        min-height: 75px;
-        font-size: 12px;
-      }
-    }
-
-    /* Tablets */
     @media (max-width: 968px) {
       .hero {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: var(--fib-2) var(--fib-4) var(--fib-5);
-        padding-bottom: calc(var(--fib-7) + var(--fib-5));
-        gap: var(--fib-4);
-        min-height: 100vh;
-      }
-
-      /* Fish container - always first on mobile */
-      .hero-fish-container {
-        order: 1 !important;
-      }
-
-      .hero-fish-container.final-position {
-        order: 1 !important; /* Fish appear first */
-        margin-bottom: var(--fib-4);
-        margin-top: 0;
-        flex-shrink: 0;
-        position: relative !important;
-        top: auto !important;
-        left: auto !important;
-        transform: none !important;
+        grid-template-columns: 1fr;
+        text-align: center;
+        padding: var(--fib-5);
+        padding-top: var(--fib-7);
       }
 
       .hero-content {
-        text-align: center;
         padding-left: 0;
-        max-width: 800px;
-        width: 100%;
-        flex: 0 0 auto;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: var(--fib-3);
-        /* Mobile: Fade in only, no transform */
-        transform: none !important;
-        transition: opacity 1.2s ease-out !important;
-        order: 2 !important; /* Ensure content appears after fish */
+        order: 1;
       }
 
       .hero-content.visible {
-        opacity: 1;
-        transform: none !important;
+        transform: translateY(0);
       }
 
-      .logo-container {
-        display: none; /* Hide logo on mobile */
+      .hero-content {
+        transform: translateY(40px);
+      }
+
+      .hero-fish-container {
+        order: 0;
+        margin-bottom: var(--fib-5);
+      }
+
+      .hero-fish-container.final-position {
+        position: relative;
       }
 
       .brand-name {
         font-size: var(--font-size-2xl);
-        margin-bottom: var(--fib-3);
       }
 
       .tagline {
         font-size: var(--font-size-lg);
-        margin-bottom: var(--fib-4);
       }
 
       .value-props {
         align-items: center;
-        margin-bottom: 0;
-      }
-
-      .hero-fish svg {
-        width: 75px;
-      }
-
-      .hero-bubble {
-        width: 140px;
-        min-height: 65px;
-        font-size: 11px;
-        padding: var(--fib-2);
-      }
-
-      .hero-fish-pair {
-        gap: var(--fib-3);
-      }
-
-      .value-props {
-        gap: var(--fib-2);
-        margin-bottom: var(--fib-4);
-      }
-
-      .value-prop {
-        font-size: var(--font-size-sm);
       }
 
       .signup-form {
@@ -1614,126 +1442,30 @@
         width: 180px;
         height: 300px;
       }
-
-      .learn-more-section {
-        grid-template-columns: 1fr;
-        padding: var(--fib-6) var(--fib-4);
-        gap: var(--fib-5);
-      }
-
-      .phone-mockup {
-        width: 260px;
-        height: 520px;
-      }
-
-      .big-fish {
-        width: 180px; /* Match SVG width */
-        height: 90px; /* Maintain 2:1 aspect ratio */
-      }
-
-      .big-fish svg {
-        width: 100%;
-        height: 100%;
-      }
-
-      .cowboy-hat {
-        top: -4.5px; /* Scaled: -5px * 0.9 */
-      }
-
-      .bobbers-container {
-        gap: var(--fib-6);
-        bottom: var(--fib-4);
-      }
     }
 
-    /* Small Tablets and Large Phones */
-    @media (max-width: 768px) {
-      .hero {
-        padding: var(--fib-2) var(--fib-3) var(--fib-4);
-        padding-bottom: calc(var(--fib-6) + var(--fib-4));
-        gap: var(--fib-4);
-        min-height: 100vh;
-        justify-content: center;
-      }
-
-      /* Fish container - always first on mobile */
-      .hero-fish-container {
-        order: 1 !important;
-      }
-
-      .hero-fish-container.final-position {
-        order: 1 !important; /* Fish appear first */
-        margin-bottom: var(--fib-4);
-        margin-top: 0;
-        position: relative !important;
-        top: auto !important;
-        left: auto !important;
-        transform: none !important;
-      }
-
-      .hero-content {
-        gap: var(--fib-2);
-        /* Mobile: Fade in only, no transform */
-        opacity: 0;
-        transform: none !important;
-        transition: opacity 1.2s ease-out !important;
-        order: 2 !important; /* Ensure content appears after fish */
-        justify-content: center;
-        align-items: center;
-      }
-
-      .hero-content.visible {
-        opacity: 1;
-        transform: none !important;
-      }
-
-      .logo-container {
-        display: none; /* Hide logo on mobile */
-      }
-
+    @media (max-width: 480px) {
       .brand-name {
         font-size: var(--font-size-xl);
-        margin-bottom: var(--fib-3);
-      }
-
-      .tagline {
-        font-size: var(--font-size-base);
-        margin-bottom: var(--fib-4);
       }
 
       .hero-fish svg {
-        width: 65px;
+        width: 60px;
       }
 
-      .hero-bubble {
-        width: 120px;
-        min-height: 60px;
-        font-size: 10px;
-        padding: var(--fib-2);
+      .signup-title {
+        font-size: var(--font-size-xl);
       }
 
-      .hero-fish-pair {
-        gap: var(--fib-2);
-      }
-
-      .value-props {
-        gap: var(--fib-2);
-        margin-bottom: 0;
-      }
-
-      .value-prop {
-        font-size: var(--font-size-xs);
-        gap: var(--fib-1);
-      }
-
-      .value-prop svg {
-        width: var(--fib-2);
-        height: var(--fib-2);
+      footer {
+        flex-direction: column;
+        gap: var(--fib-3);
+        text-align: center;
       }
 
       .learn-more-section {
-        padding: var(--fib-5) var(--fib-3);
-        gap: var(--fib-4);
+        grid-template-columns: 1fr;
+        padding: var(--fib-5);
       }
 
       .phone-mockup {
@@ -1741,357 +1473,17 @@
         height: 480px;
       }
 
-      .big-fish {
-        width: 160px; /* Match SVG width */
-        height: 80px; /* Maintain 2:1 aspect ratio */
-      }
-
       .big-fish svg {
-        width: 100%;
-        height: 100%;
-      }
-
-      .cowboy-hat {
-        top: -4px; /* Scaled: -5px * 0.8 */
-      }
-
-      .scratch-box {
-        width: 68px;
-        height: 42px;
-      }
-
-      .bobbers-container {
-        gap: var(--fib-5);
-        bottom: var(--fib-3);
-      }
-
-      .bobber {
-        width: 42px;
-        height: 68px;
-      }
-
-      .bobber-body {
-        width: 42px;
-        height: 42px;
-      }
-
-      .fishing-line {
-        height: 68px;
-      }
-    }
-
-    /* Mobile Phones */
-    @media (max-width: 480px) {
-      .hero {
-        padding: var(--fib-2) var(--fib-2) var(--fib-3);
-        padding-bottom: calc(var(--fib-5) + var(--fib-3));
-        gap: var(--fib-4);
-        min-height: 100vh;
-        justify-content: center;
-      }
-
-      /* Fish container - always first on mobile */
-      .hero-fish-container {
-        order: 1 !important;
-      }
-
-      .hero-fish-container.final-position {
-        order: 1 !important; /* Fish appear first */
-        margin-bottom: var(--fib-4);
-        margin-top: 0;
-        position: relative !important;
-        top: auto !important;
-        left: auto !important;
-        transform: none !important;
-      }
-
-      .hero-content {
-        gap: var(--fib-2);
-        /* Mobile: Fade in only, no transform */
-        opacity: 0;
-        transform: none !important;
-        transition: opacity 1.2s ease-out !important;
-        order: 2 !important; /* Ensure content appears after fish */
-        justify-content: center;
-        align-items: center;
-      }
-
-      .hero-content.visible {
-        opacity: 1;
-        transform: none !important;
-      }
-
-      .logo-container {
-        display: none; /* Hide logo on mobile */
-      }
-
-      .brand-name {
-        font-size: var(--font-size-xl);
-        margin-bottom: var(--fib-2);
-      }
-
-      .tagline {
-        font-size: var(--font-size-sm);
-        margin-bottom: var(--fib-3);
-      }
-
-      .hero-fish svg {
-        width: 55px;
-      }
-
-      .hero-bubble {
-        width: 110px;
-        min-height: 55px;
-        font-size: 9px;
-        padding: var(--fib-1) var(--fib-2);
-      }
-
-      .hero-fish-pair {
-        gap: var(--fib-2);
-      }
-
-      .conversation-label {
-        font-size: var(--font-size-lg);
-        top: -120px;
-      }
-
-      .value-props {
-        gap: var(--fib-2);
-        margin-bottom: 0;
-      }
-
-      .value-prop {
-        font-size: var(--font-size-xs);
-        gap: var(--fib-1);
-      }
-
-      .value-prop svg {
-        width: var(--fib-2);
-        height: var(--fib-2);
-      }
-
-      .signup-title {
-        font-size: var(--font-size-xl);
-      }
-
-      .learn-more-section {
-        padding: var(--fib-5) var(--fib-3);
-        gap: var(--fib-3);
-      }
-
-      .section-subtitle {
-        font-size: var(--font-size-base);
-        margin-bottom: var(--fib-4);
-      }
-
-      .phone-mockup {
-        width: 200px;
-        height: 400px;
-        padding: 10px;
-      }
-
-      .phone-mockup::before {
-        width: 60px;
-        height: 16px;
-        top: 6px;
-      }
-
-      .chat-header {
-        padding: var(--fib-1) var(--fib-2);
-      }
-
-      .chat-avatar {
-        width: 26px;
-        height: 26px;
-      }
-
-      .chat-avatar svg {
-        width: 16px;
-      }
-
-      .chat-name {
-        font-size: 11px;
-      }
-
-      .chat-msg {
-        font-size: 11px;
-        padding: var(--fib-1) var(--fib-2);
-      }
-
-      .big-fish {
-        width: 130px; /* Match SVG width */
-        height: 65px; /* Maintain 2:1 aspect ratio */
-      }
-
-      .big-fish svg {
-        width: 100%;
-        height: 100%;
-      }
-
-      .cowboy-hat {
-        top: -3.25px; /* Scaled: -5px * 0.65 */
+        width: 150px;
       }
 
       .scratch-boxes {
         flex-wrap: wrap;
         justify-content: center;
-        gap: var(--fib-2);
-        margin-top: var(--fib-3);
-      }
-
-      .scratch-box {
-        width: 55px;
-        height: 34px;
-      }
-
-      .scratch-label {
-        font-size: 7px;
-        margin-bottom: 2px;
-      }
-
-      .scratch-value {
-        font-size: 9px;
       }
 
       .bobbers-container {
-        gap: var(--fib-4);
-        bottom: var(--fib-2);
-      }
-
-      .bobber-label {
-        font-size: var(--font-size-sm);
-        margin-bottom: var(--fib-2);
-      }
-
-      .bobber {
-        width: 34px;
-        height: 55px;
-      }
-
-      .bobber-top {
-        width: 16px;
-        height: 10px;
-      }
-
-      .bobber-body {
-        width: 34px;
-        height: 34px;
-      }
-
-      .fishing-line {
-        height: 55px;
-      }
-
-      .skip-intro {
-        bottom: var(--fib-2);
-        right: var(--fib-2);
-        padding: var(--fib-1) var(--fib-2);
-        font-size: 10px;
-      }
-
-      footer {
-        flex-direction: column;
-        gap: var(--fib-2);
-        text-align: center;
-        padding: var(--fib-3) var(--fib-4);
-      }
-
-      .footer-logo svg {
-        width: var(--fib-3);
-      }
-
-      .footer-text {
-        font-size: 10px;
-      }
-
-      .wave-separator {
-        height: var(--fib-4);
-      }
-    }
-
-    /* Very Small Phones */
-    @media (max-width: 360px) {
-      .hero {
-        padding: var(--fib-2);
-        padding-bottom: calc(var(--fib-4) + var(--fib-2));
-        gap: var(--fib-2);
-      }
-
-      .brand-name {
-        font-size: var(--font-size-lg);
-      }
-
-      .hero-fish svg {
-        width: 50px;
-      }
-
-      .hero-bubble {
-        width: 100px;
-        min-height: 50px;
-        font-size: 8px;
-      }
-
-      .signup-section {
-        grid-template-columns: 1fr;
-        text-align: center;
-      }
-
-      .match-stack-container {
-        height: 380px;
-        margin-top: var(--fib-5);
-      }
-
-      .match-card {
-        width: 180px;
-        height: 300px;
-      }
-
-      .phone-mockup {
-        width: 180px;
-        height: 360px;
-      }
-
-      .big-fish {
-        width: 110px; /* Match SVG width */
-        height: 55px; /* Maintain 2:1 aspect ratio */
-      }
-
-      .big-fish svg {
-        width: 100%;
-        height: 100%;
-      }
-
-      .cowboy-hat {
-        top: -2.75px; /* Scaled: -5px * 0.55 */
-      }
-
-      .scratch-box {
-        width: 45px;
-        height: 28px;
-      }
-    }
-
-    /* Landscape Orientation */
-    @media (max-height: 600px) and (orientation: landscape) {
-      .hero {
-        min-height: auto;
-        padding: var(--fib-3) var(--fib-4);
-        gap: var(--fib-3);
-        padding-bottom: calc(var(--fib-5) + var(--fib-3));
-      }
-
-      .hero-fish svg {
-        width: 50px;
-      }
-
-      .hero-bubble {
-        width: 100px;
-        min-height: 50px;
-        font-size: 9px;
-      }
-
-      .bobbers-container {
-        bottom: var(--fib-2);
+        gap: var(--fib-5);
       }
     }
   </style>
@@ -2492,9 +1884,7 @@
 
     // Create chaotic fish
     function createChaoticFish() {
-      // Reduce fish count on mobile for better performance
-      const isMobile = window.innerWidth <= 768;
-      const fishCount = isMobile ? 50 : 100;
+      const fishCount = 100;
       const bubbleChance = 0.30; // 30% of fish get speech bubbles
       
       for (let i = 0; i < fishCount; i++) {
@@ -2546,34 +1936,24 @@
       }
     }
 
-    // Calculate where the fish should end up
+    // Calculate where the fish should end up in the grid
     function getTargetPosition() {
+      // Temporarily make the container relative to measure where it should be
       const hero = document.querySelector('.hero');
       const heroRect = hero.getBoundingClientRect();
-      const isMobile = window.innerWidth <= 968;
+      const gap = 89; // --fib-6
+      const padding = 89; // --fib-6
       
-      if (isMobile) {
-        // Mobile: Fish stay centered - return current center position (not used, but kept for compatibility)
-        return {
-          left: heroRect.left + (heroRect.width / 2),
-          top: heroRect.top + (heroRect.height / 2)
-        };
-      } else {
-        // Desktop: Fish slide to right column (original behavior)
-        const gap = 89; // --fib-6
-        const padding = 89; // --fib-6
-        
-        // Calculate right column center (grid is 1fr 1fr with gap)
-        const columnWidth = (heroRect.width - gap - (padding * 2)) / 2;
-        const rightColumnLeft = heroRect.left + padding + columnWidth + gap;
-        const rightColumnCenter = rightColumnLeft + (columnWidth / 2);
-        const verticalCenter = heroRect.top + (heroRect.height / 2);
-        
-        return {
-          left: rightColumnCenter,
-          top: verticalCenter
-        };
-      }
+      // Calculate right column center (grid is 1fr 1fr with gap)
+      const columnWidth = (heroRect.width - gap - (padding * 2)) / 2;
+      const rightColumnLeft = heroRect.left + padding + columnWidth + gap;
+      const rightColumnCenter = rightColumnLeft + (columnWidth / 2);
+      const verticalCenter = heroRect.top + (heroRect.height / 2);
+      
+      return {
+        left: rightColumnCenter,
+        top: verticalCenter
+      };
     }
 
     // Animation timeline
@@ -2630,36 +2010,22 @@
         
         // Calculate target position BEFORE animating
         const target = getTargetPosition();
-        const isMobile = window.innerWidth <= 968;
         
         // Shrink fish to final size
         fishConversation.classList.add('final-size');
         
-        if (isMobile) {
-          // Mobile: Fish stay in their current centered position - don't move at all
-          // Just shrink and add final-position class immediately
-          setTimeout(() => {
-            // Add final-position class to switch to relative positioning
-            fishContainer.classList.add('final-position');
-            
-            // Ensure fish stay centered in their container
-            fishContainer.style.top = '';
-            fishContainer.style.left = '';
-            fishContainer.style.transform = '';
-          }, 1500);
-        } else {
-          // Desktop: Animate fish container to target position (stays fixed during animation)
-          fishContainer.style.top = target.top + 'px';
-          fishContainer.style.left = target.left + 'px';
-          fishContainer.style.transform = 'translate(-50%, -50%)';
-          
-          // After animation completes, switch to relative positioning
-          setTimeout(() => {
-            fishContainer.classList.add('final-position');
-          }, 1500);
-        }
+        // Animate fish container to target position (stays fixed during animation)
+        fishContainer.style.top = target.top + 'px';
+        fishContainer.style.left = target.left + 'px';
+        fishContainer.style.transform = 'translate(-50%, -50%)'; // Keep centered on target point
         
-        // Show hero content (fade in on mobile, slide on desktop)
+        // After animation completes, switch to relative positioning
+        // (floating animation and conversation cycling already started in Phase 2)
+        setTimeout(() => {
+          fishContainer.classList.add('final-position');
+        }, 1500);
+        
+        // Slide in hero content from left
         setTimeout(() => {
           heroContent.classList.add('visible');
         }, 300);
@@ -2763,153 +2129,25 @@
     document.getElementById('signupForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const email = this.querySelector('input').value;
+      
+      // Show success state
       const btn = this.querySelector('button');
-      const input = this.querySelector('input');
       const originalText = btn.textContent;
-      
-      // Disable form during submission
-      btn.disabled = true;
-      input.disabled = true;
-      
-      // Animate pearls
-      const pearls = document.querySelectorAll('.pearl');
-      pearls.forEach((pearl, index) => {
-        setTimeout(() => {
-          pearl.style.animation = 'pearlPulse 0.5s ease-out';
-          setTimeout(() => {
-            pearl.style.animation = '';
-          }, 500);
-        }, index * 100);
-      });
-      
-      // Show success state with animation
       btn.textContent = '✓ You\'re on the list!';
       btn.style.background = 'var(--teal-soft)';
-      btn.style.transform = 'scale(1.05)';
       
-      // Create success particles
-      createSuccessParticles(btn);
-      
-      // Reset after delay
       setTimeout(() => {
         btn.textContent = originalText;
         btn.style.background = '';
-        btn.style.transform = '';
-        btn.disabled = false;
-        input.disabled = false;
-        input.value = '';
-        input.focus();
+        this.querySelector('input').value = '';
       }, 3000);
       
       console.log('Email submitted:', email);
       // TODO: Connect to actual email collection service
     });
 
-    // Pearl pulse animation for success
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes pearlPulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.3); }
-      }
-    `;
-    document.head.appendChild(style);
-
-    // Success particles animation
-    function createSuccessParticles(element) {
-      const rect = element.getBoundingClientRect();
-      const colors = ['#00d4aa', '#ffffff', '#00ffd9'];
-      
-      for (let i = 0; i < 20; i++) {
-        const particle = document.createElement('div');
-        particle.style.position = 'fixed';
-        particle.style.width = '6px';
-        particle.style.height = '6px';
-        particle.style.borderRadius = '50%';
-        particle.style.background = colors[Math.floor(Math.random() * colors.length)];
-        particle.style.left = rect.left + rect.width / 2 + 'px';
-        particle.style.top = rect.top + rect.height / 2 + 'px';
-        particle.style.pointerEvents = 'none';
-        particle.style.zIndex = '9999';
-        particle.style.opacity = '1';
-        
-        const angle = (Math.PI * 2 * i) / 20;
-        const velocity = 50 + Math.random() * 50;
-        const vx = Math.cos(angle) * velocity;
-        const vy = Math.sin(angle) * velocity;
-        
-        document.body.appendChild(particle);
-        
-        let x = rect.left + rect.width / 2;
-        let y = rect.top + rect.height / 2;
-        let opacity = 1;
-        
-        const animate = () => {
-          x += vx * 0.1;
-          y += vy * 0.1;
-          opacity -= 0.02;
-          
-          particle.style.left = x + 'px';
-          particle.style.top = y + 'px';
-          particle.style.opacity = opacity;
-          
-          if (opacity > 0) {
-            requestAnimationFrame(animate);
-          } else {
-            particle.remove();
-          }
-        };
-        
-        requestAnimationFrame(animate);
-      }
-    }
-
-    // Add scroll-triggered animations
-    const observerOptions = {
-      threshold: 0.3,
-      rootMargin: '0px'
-    };
-
-    const signupObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          
-          // Animate pearls on scroll into view
-          const pearls = entry.target.querySelectorAll('.pearl');
-          pearls.forEach((pearl, index) => {
-            setTimeout(() => {
-              pearl.style.animation = 'pearlShine 2s ease-in-out infinite, pearlFloat 3s ease-in-out infinite';
-            }, index * 100);
-          });
-        }
-      });
-    }, observerOptions);
-
-    // Observe signup section when it loads
-    window.addEventListener('load', () => {
-      const signupSection = document.getElementById('signupSection');
-      if (signupSection) {
-        signupObserver.observe(signupSection);
-      }
-    });
-
     // Start animation on load
     window.addEventListener('load', runAnimation);
-
-    // Handle window resize for responsive positioning
-    let resizeTimeout;
-    window.addEventListener('resize', () => {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(() => {
-        // If fish are already in final position, recalculate
-        if (fishContainer.classList.contains('final-position')) {
-          const target = getTargetPosition();
-          fishContainer.style.left = target.left + 'px';
-          fishContainer.style.top = target.top + 'px';
-        }
-      }, 250);
-    });
 
     // ============================================
     // MATCH CARD STACK ANIMATION
