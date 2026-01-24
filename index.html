@@ -772,15 +772,37 @@
         inset -2px -2px 4px rgba(0,0,0,0.2),
         inset 2px 2px 4px rgba(255,255,255,0.8),
         0 2px 8px rgba(0, 212, 170, 0.3);
-      animation: pearlShine 2s ease-in-out infinite;
+      animation: pearlShine 2s ease-in-out infinite, pearlFloat 3s ease-in-out infinite;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    .pearl:nth-child(2) { animation-delay: 0.3s; }
-    .pearl:nth-child(3) { animation-delay: 0.6s; }
+    .pearl:hover {
+      transform: scale(1.2);
+      box-shadow: 
+        inset -2px -2px 4px rgba(0,0,0,0.2),
+        inset 2px 2px 4px rgba(255,255,255,0.8),
+        0 4px 16px rgba(0, 212, 170, 0.6);
+    }
+
+    .pearl:nth-child(1) { 
+      animation-delay: 0s, 0s; 
+    }
+    .pearl:nth-child(2) { 
+      animation-delay: 0.3s, 1s; 
+    }
+    .pearl:nth-child(3) { 
+      animation-delay: 0.6s, 2s; 
+    }
 
     @keyframes pearlShine {
       0%, 100% { transform: scale(1); }
       50% { transform: scale(1.1); }
+    }
+
+    @keyframes pearlFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
     }
 
     .pearl-text {
@@ -794,6 +816,9 @@
       font-weight: 700;
       margin-bottom: var(--fib-3);
       color: var(--pearl-white);
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.8s ease-out 0.2s forwards;
     }
 
     .signup-subtitle {
@@ -801,6 +826,33 @@
       color: var(--text-secondary);
       margin-bottom: var(--fib-5);
       max-width: 600px;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.8s ease-out 0.4s forwards;
+    }
+
+    .signup-form {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.8s ease-out 0.6s forwards;
+    }
+
+    .privacy-note {
+      opacity: 0;
+      animation: fadeIn 0.8s ease-out 0.8s forwards;
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
     }
 
     .signup-form {
@@ -831,6 +883,13 @@
       border-color: var(--teal-glow);
       background: rgba(0, 212, 170, 0.05);
       box-shadow: 0 0 20px rgba(0, 212, 170, 0.2);
+      transform: translateY(-2px);
+      transition: all 0.3s ease;
+    }
+
+    .email-input:not(:placeholder-shown) {
+      border-color: var(--teal-soft);
+      background: rgba(0, 212, 170, 0.08);
     }
 
     .submit-btn {
@@ -849,13 +908,42 @@
       white-space: nowrap;
     }
 
+    .submit-btn {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .submit-btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s ease, height 0.6s ease;
+    }
+
     .submit-btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 25px rgba(0, 212, 170, 0.4);
     }
 
+    .submit-btn:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
     .submit-btn:active {
       transform: translateY(0);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
     }
 
     .privacy-note {
@@ -1178,15 +1266,21 @@
     .big-fish {
       position: relative;
       animation: bigFishFloat 4s ease-in-out infinite;
+      /* Container matches SVG dimensions for accurate absolute positioning */
+      display: inline-block;
+      width: 200px; /* Desktop fish width - will be overridden in media queries */
+      height: 100px; /* Fish SVG aspect ratio is 2:1 (viewBox="0 0 100 50") */
+      line-height: 0; /* Remove inline spacing */
     }
 
     .big-fish svg {
-      width: 200px;
-      height: auto;
+      width: 100%;
+      height: 100%;
       stroke: var(--teal-glow);
       fill: none;
       stroke-width: 1.5;
       filter: drop-shadow(0 0 30px rgba(0, 212, 170, 0.3));
+      display: block;
     }
 
     @keyframes bigFishFloat {
@@ -1207,9 +1301,10 @@
 
     .cowboy-hat {
       top: -5px; /* Positioned to overlap with fish's back, sitting on it */
-      left: 28px; /* Centered on the highest part of the fish's back */
-      width: var(--fib-5); /* 55px */
-      height: var(--fib-4); /* 34px */
+      left: 14%; /* Centered on the highest part of the fish's back (28px / 200px = 14%) */
+      width: 27.5%; /* 55px / 200px = 27.5% - scales with fish width */
+      height: auto;
+      aspect-ratio: 60 / 40; /* Match viewBox="0 0 60 40" for accurate proportions */
       transform: scale(0);
     }
 
@@ -1227,10 +1322,11 @@
 
     .snail-icon {
       top: 50%;
-      left: calc(var(--fib-5) * -1); /* -55px - same distance as movie tickets */
+      left: -27.5%; /* -55px / 200px = -27.5% - scales with fish */
       transform: translateY(-50%) scale(0.5);
-      height: var(--fib-5); /* 55px - Fibonacci proportion */
-      width: auto;
+      width: 27.5%; /* 55px / 200px = 27.5% - scales with fish WIDTH */
+      height: auto;
+      aspect-ratio: 50 / 40; /* Maintain snail proportions from viewBox */
     }
 
     .snail-icon.visible {
@@ -1238,8 +1334,8 @@
     }
 
     .snail-icon svg {
+      width: 100%;
       height: 100%;
-      width: auto;
       stroke: var(--teal-soft);
       fill: none;
       stroke-width: 2;
@@ -1247,10 +1343,11 @@
 
     .movie-tickets {
       top: 50%;
-      right: calc(var(--fib-5) * -1); /* -55px */
+      right: -27.5%; /* -55px / 200px = -27.5% - scales with fish */
       transform: translateY(-50%) scale(0.5);
-      width: var(--fib-5); /* 55px - Fibonacci proportion */
-      height: var(--fib-5); /* 55px */
+      width: 27.5%; /* 55px / 200px = 27.5% - scales with fish WIDTH */
+      height: auto;
+      aspect-ratio: 45 / 55; /* Maintain ticket proportions from viewBox */
     }
 
     .movie-tickets.visible {
@@ -1532,8 +1629,18 @@
         height: 520px;
       }
 
+      .big-fish {
+        width: 180px; /* Match SVG width */
+        height: 90px; /* Maintain 2:1 aspect ratio */
+      }
+
       .big-fish svg {
-        width: 180px;
+        width: 100%;
+        height: 100%;
+      }
+
+      .cowboy-hat {
+        top: -4.5px; /* Scaled: -5px * 0.9 */
       }
 
       .bobbers-container {
@@ -1643,13 +1750,7 @@
       }
 
       .match-stack-container {
-        height: 320px;
-        margin-top: var(--fib-4);
-      }
-
-      .match-card {
-        width: 160px;
-        height: 260px;
+        display: none; /* Hide cards on mobile */
       }
 
       .learn-more-section {
@@ -1662,26 +1763,18 @@
         height: 480px;
       }
 
+      .big-fish {
+        width: 160px; /* Match SVG width */
+        height: 80px; /* Maintain 2:1 aspect ratio */
+      }
+
       .big-fish svg {
-        width: 160px;
+        width: 100%;
+        height: 100%;
       }
 
       .cowboy-hat {
-        width: var(--fib-4);
-        height: var(--fib-3);
-        left: 24px;
-        top: -3px;
-      }
-
-      .snail-icon {
-        height: var(--fib-4);
-        left: calc(var(--fib-4) * -1);
-      }
-
-      .movie-tickets {
-        width: var(--fib-4);
-        height: var(--fib-4);
-        right: calc(var(--fib-4) * -1);
+        top: -4px; /* Scaled: -5px * 0.8 */
       }
 
       .scratch-box {
@@ -1839,18 +1932,7 @@
       }
 
       .match-stack-container {
-        height: 280px;
-        margin-top: var(--fib-3);
-      }
-
-      .match-card {
-        width: 144px;
-        height: 233px;
-      }
-
-      .match-card .profile-name,
-      .match-card .profile-age {
-        font-size: 14px;
+        display: none; /* Hide cards on mobile */
       }
 
       .learn-more-section {
@@ -1897,26 +1979,18 @@
         padding: var(--fib-1) var(--fib-2);
       }
 
+      .big-fish {
+        width: 130px; /* Match SVG width */
+        height: 65px; /* Maintain 2:1 aspect ratio */
+      }
+
       .big-fish svg {
-        width: 130px;
+        width: 100%;
+        height: 100%;
       }
 
       .cowboy-hat {
-        width: var(--fib-3);
-        height: var(--fib-2);
-        left: 20px;
-        top: -2px;
-      }
-
-      .snail-icon {
-        height: var(--fib-3);
-        left: calc(var(--fib-3) * -1);
-      }
-
-      .movie-tickets {
-        width: var(--fib-3);
-        height: var(--fib-3);
-        right: calc(var(--fib-3) * -1);
+        top: -3.25px; /* Scaled: -5px * 0.65 */
       }
 
       .scratch-boxes {
@@ -2018,9 +2092,8 @@
         font-size: 8px;
       }
 
-      .match-card {
-        width: 120px;
-        height: 195px;
+      .match-stack-container {
+        display: none; /* Hide cards on mobile */
       }
 
       .phone-mockup {
@@ -2028,8 +2101,18 @@
         height: 360px;
       }
 
+      .big-fish {
+        width: 110px; /* Match SVG width */
+        height: 55px; /* Maintain 2:1 aspect ratio */
+      }
+
       .big-fish svg {
-        width: 110px;
+        width: 100%;
+        height: 100%;
+      }
+
+      .cowboy-hat {
+        top: -2.75px; /* Scaled: -5px * 0.55 */
       }
 
       .scratch-box {
@@ -2520,12 +2603,10 @@
       const isMobile = window.innerWidth <= 968;
       
       if (isMobile) {
-        // Mobile: Fish positioned much lower - use viewport percentage
-        // Start from center (50%) and move DOWN to ~25% from top
-        const viewportHeight = window.innerHeight;
+        // Mobile: Fish stay centered - return current center position (not used, but kept for compatibility)
         return {
           left: heroRect.left + (heroRect.width / 2),
-          top: heroRect.top + (viewportHeight * 0.25) // 25% from top - much lower
+          top: heroRect.top + (heroRect.height / 2)
         };
       } else {
         // Desktop: Fish slide to right column (original behavior)
@@ -2599,50 +2680,27 @@
         
         // Calculate target position BEFORE animating
         const target = getTargetPosition();
+        const isMobile = window.innerWidth <= 968;
         
         // Shrink fish to final size
         fishConversation.classList.add('final-size');
         
-        // Animate fish container to target position (stays fixed during animation)
-        const isMobile = window.innerWidth <= 968;
-        fishContainer.style.top = target.top + 'px';
-        fishContainer.style.left = target.left + 'px';
-        
         if (isMobile) {
-          // Mobile: Center horizontally, align to top (no vertical centering)
-          fishContainer.style.transform = 'translate(-50%, 0)';
-          
-          // After animation completes, smoothly transition to relative positioning
+          // Mobile: Fish stay in their current centered position - don't move at all
+          // Just shrink and add final-position class immediately
           setTimeout(() => {
-            // Capture the exact visual position before switching
-            const rect = fishContainer.getBoundingClientRect();
-            const heroRect = hero.getBoundingClientRect();
-            const visualTop = rect.top - heroRect.top;
-            
-            // Add final-position class
+            // Add final-position class to switch to relative positioning
             fishContainer.classList.add('final-position');
             
-            // Immediately set margin-top to match visual position to prevent jump
-            requestAnimationFrame(() => {
-              fishContainer.style.marginTop = visualTop + 'px';
-              fishContainer.style.top = '';
-              fishContainer.style.left = '';
-              fishContainer.style.transform = '';
-              
-              // Smoothly transition margin-top to CSS value
-              setTimeout(() => {
-                fishContainer.style.transition = 'margin-top 0.5s ease-out';
-                fishContainer.style.marginTop = '';
-                
-                // Clear transition after animation
-                setTimeout(() => {
-                  fishContainer.style.transition = '';
-                }, 500);
-              }, 50);
-            });
+            // Ensure fish stay centered in their container
+            fishContainer.style.top = '';
+            fishContainer.style.left = '';
+            fishContainer.style.transform = '';
           }, 1500);
         } else {
-          // Desktop: Keep centered on target point (original behavior)
+          // Desktop: Animate fish container to target position (stays fixed during animation)
+          fishContainer.style.top = target.top + 'px';
+          fishContainer.style.left = target.left + 'px';
           fishContainer.style.transform = 'translate(-50%, -50%)';
           
           // After animation completes, switch to relative positioning
@@ -2755,21 +2813,135 @@
     document.getElementById('signupForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const email = this.querySelector('input').value;
-      
-      // Show success state
       const btn = this.querySelector('button');
+      const input = this.querySelector('input');
       const originalText = btn.textContent;
+      
+      // Disable form during submission
+      btn.disabled = true;
+      input.disabled = true;
+      
+      // Animate pearls
+      const pearls = document.querySelectorAll('.pearl');
+      pearls.forEach((pearl, index) => {
+        setTimeout(() => {
+          pearl.style.animation = 'pearlPulse 0.5s ease-out';
+          setTimeout(() => {
+            pearl.style.animation = '';
+          }, 500);
+        }, index * 100);
+      });
+      
+      // Show success state with animation
       btn.textContent = '✓ You\'re on the list!';
       btn.style.background = 'var(--teal-soft)';
+      btn.style.transform = 'scale(1.05)';
       
+      // Create success particles
+      createSuccessParticles(btn);
+      
+      // Reset after delay
       setTimeout(() => {
         btn.textContent = originalText;
         btn.style.background = '';
-        this.querySelector('input').value = '';
+        btn.style.transform = '';
+        btn.disabled = false;
+        input.disabled = false;
+        input.value = '';
+        input.focus();
       }, 3000);
       
       console.log('Email submitted:', email);
       // TODO: Connect to actual email collection service
+    });
+
+    // Pearl pulse animation for success
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes pearlPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.3); }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Success particles animation
+    function createSuccessParticles(element) {
+      const rect = element.getBoundingClientRect();
+      const colors = ['#00d4aa', '#ffffff', '#00ffd9'];
+      
+      for (let i = 0; i < 20; i++) {
+        const particle = document.createElement('div');
+        particle.style.position = 'fixed';
+        particle.style.width = '6px';
+        particle.style.height = '6px';
+        particle.style.borderRadius = '50%';
+        particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+        particle.style.left = rect.left + rect.width / 2 + 'px';
+        particle.style.top = rect.top + rect.height / 2 + 'px';
+        particle.style.pointerEvents = 'none';
+        particle.style.zIndex = '9999';
+        particle.style.opacity = '1';
+        
+        const angle = (Math.PI * 2 * i) / 20;
+        const velocity = 50 + Math.random() * 50;
+        const vx = Math.cos(angle) * velocity;
+        const vy = Math.sin(angle) * velocity;
+        
+        document.body.appendChild(particle);
+        
+        let x = rect.left + rect.width / 2;
+        let y = rect.top + rect.height / 2;
+        let opacity = 1;
+        
+        const animate = () => {
+          x += vx * 0.1;
+          y += vy * 0.1;
+          opacity -= 0.02;
+          
+          particle.style.left = x + 'px';
+          particle.style.top = y + 'px';
+          particle.style.opacity = opacity;
+          
+          if (opacity > 0) {
+            requestAnimationFrame(animate);
+          } else {
+            particle.remove();
+          }
+        };
+        
+        requestAnimationFrame(animate);
+      }
+    }
+
+    // Add scroll-triggered animations
+    const observerOptions = {
+      threshold: 0.3,
+      rootMargin: '0px'
+    };
+
+    const signupObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          
+          // Animate pearls on scroll into view
+          const pearls = entry.target.querySelectorAll('.pearl');
+          pearls.forEach((pearl, index) => {
+            setTimeout(() => {
+              pearl.style.animation = 'pearlShine 2s ease-in-out infinite, pearlFloat 3s ease-in-out infinite';
+            }, index * 100);
+          });
+        }
+      });
+    }, observerOptions);
+
+    // Observe signup section when it loads
+    window.addEventListener('load', () => {
+      const signupSection = document.getElementById('signupSection');
+      if (signupSection) {
+        signupObserver.observe(signupSection);
+      }
     });
 
     // Start animation on load
