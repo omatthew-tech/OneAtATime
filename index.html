@@ -309,7 +309,7 @@
     }
 
     /* ============================================
-       HERO CONTENT (Slides in from left)
+       HERO CONTENT (Slides in from left on desktop)
        ============================================ */
     .hero-content {
       z-index: 1;
@@ -322,6 +322,15 @@
     .hero-content.visible {
       opacity: 1;
       transform: translateX(0);
+    }
+
+    /* Mobile: Only fade in, no transform */
+    @media (max-width: 968px) {
+      .hero-content {
+        opacity: 0;
+        transform: none !important;
+        transition: opacity 1.2s ease-out !important;
+      }
     }
 
     .logo-container {
@@ -395,7 +404,7 @@
     }
 
     /* ============================================
-       FISH CONVERSATION (Animates from center to right)
+       FISH CONVERSATION (Animates from center to right on desktop, up on mobile)
        ============================================ */
     .hero-fish-container {
       position: fixed;
@@ -408,7 +417,8 @@
       z-index: 102;
       transition: top 1.5s cubic-bezier(0.4, 0, 0.2, 1),
                   left 1.5s cubic-bezier(0.4, 0, 0.2, 1),
-                  transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+                  transform 1.5s cubic-bezier(0.4, 0, 0.2, 1),
+                  position 0s linear 1.5s; /* Delay position change until after animation */
     }
 
     .hero-fish-container.final-position {
@@ -417,6 +427,17 @@
       left: auto !important;
       transform: none !important;
       transition: none;
+    }
+
+    /* Mobile: Smooth transition to final position */
+    @media (max-width: 968px) {
+      .hero-fish-container.final-position {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        transform: none !important;
+        transition: none !important;
+      }
     }
 
     .hero-fish-conversation {
@@ -1380,92 +1401,260 @@
     }
 
     /* ============================================
-       RESPONSIVE DESIGN
+       RESPONSIVE DESIGN (Fibonacci-based spacing)
        ============================================ */
-    @media (max-width: 968px) {
+    
+    /* Large Tablets */
+    @media (max-width: 1200px) {
       .hero {
-        grid-template-columns: 1fr;
-        text-align: center;
         padding: var(--fib-5);
-        padding-top: var(--fib-7);
-      }
-
-      .hero-content {
-        padding-left: 0;
-        order: 1;
-      }
-
-      .hero-content.visible {
-        transform: translateY(0);
-      }
-
-      .hero-content {
-        transform: translateY(40px);
-      }
-
-      .hero-fish-container {
-        order: 0;
-        margin-bottom: var(--fib-5);
-      }
-
-      .hero-fish-container.final-position {
-        position: relative;
+        padding-bottom: calc(var(--fib-6) + var(--fib-5));
+        gap: var(--fib-4);
       }
 
       .brand-name {
         font-size: var(--font-size-2xl);
       }
 
+      .hero-fish svg {
+        width: 85px;
+      }
+
+      .hero-bubble {
+        width: 160px;
+        min-height: 75px;
+        font-size: 12px;
+      }
+    }
+
+    /* Tablets */
+    @media (max-width: 968px) {
+      .hero {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: var(--fib-2) var(--fib-4) var(--fib-5);
+        padding-bottom: calc(var(--fib-7) + var(--fib-5));
+        gap: var(--fib-4);
+        min-height: 100vh;
+      }
+
+      /* Fish container - always first on mobile */
+      .hero-fish-container {
+        order: 1 !important;
+      }
+
+      .hero-fish-container.final-position {
+        order: 1 !important; /* Fish appear first */
+        margin-bottom: var(--fib-4);
+        margin-top: 0;
+        flex-shrink: 0;
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        transform: none !important;
+      }
+
+      .hero-content {
+        text-align: center;
+        padding-left: 0;
+        max-width: 800px;
+        width: 100%;
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: var(--fib-3);
+        /* Mobile: Fade in only, no transform */
+        transform: none !important;
+        transition: opacity 1.2s ease-out !important;
+        order: 2 !important; /* Ensure content appears after fish */
+      }
+
+      .hero-content.visible {
+        opacity: 1;
+        transform: none !important;
+      }
+
+      .logo-container {
+        display: none; /* Hide logo on mobile */
+      }
+
+      .brand-name {
+        font-size: var(--font-size-2xl);
+        margin-bottom: var(--fib-3);
+      }
+
       .tagline {
         font-size: var(--font-size-lg);
+        margin-bottom: var(--fib-4);
       }
 
       .value-props {
         align-items: center;
-      }
-
-      .signup-form {
-        flex-direction: column;
-      }
-
-      .signup-section {
-        grid-template-columns: 1fr;
-        text-align: center;
-      }
-
-      .match-stack-container {
-        height: 380px;
-        margin-top: var(--fib-5);
-      }
-
-      .match-card {
-        width: 180px;
-        height: 300px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .brand-name {
-        font-size: var(--font-size-xl);
+        margin-bottom: 0;
       }
 
       .hero-fish svg {
-        width: 60px;
+        width: 75px;
       }
 
-      .signup-title {
-        font-size: var(--font-size-xl);
+      .hero-bubble {
+        width: 140px;
+        min-height: 65px;
+        font-size: 11px;
+        padding: var(--fib-2);
       }
 
-      footer {
-        flex-direction: column;
+      .hero-fish-pair {
         gap: var(--fib-3);
-        text-align: center;
+      }
+
+      .value-props {
+        gap: var(--fib-2);
+        margin-bottom: var(--fib-4);
+      }
+
+      .value-prop {
+        font-size: var(--font-size-sm);
       }
 
       .learn-more-section {
         grid-template-columns: 1fr;
-        padding: var(--fib-5);
+        padding: var(--fib-6) var(--fib-4);
+        gap: var(--fib-5);
+      }
+
+      .phone-mockup {
+        width: 260px;
+        height: 520px;
+      }
+
+      .big-fish svg {
+        width: 180px;
+      }
+
+      .bobbers-container {
+        gap: var(--fib-6);
+        bottom: var(--fib-4);
+      }
+    }
+
+    /* Small Tablets and Large Phones */
+    @media (max-width: 768px) {
+      .hero {
+        padding: var(--fib-2) var(--fib-3) var(--fib-4);
+        padding-bottom: calc(var(--fib-6) + var(--fib-4));
+        gap: var(--fib-4);
+        min-height: 100vh;
+        justify-content: center;
+      }
+
+      /* Fish container - always first on mobile */
+      .hero-fish-container {
+        order: 1 !important;
+      }
+
+      .hero-fish-container.final-position {
+        order: 1 !important; /* Fish appear first */
+        margin-bottom: var(--fib-4);
+        margin-top: 0;
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        transform: none !important;
+      }
+
+      .hero-content {
+        gap: var(--fib-2);
+        /* Mobile: Fade in only, no transform */
+        opacity: 0;
+        transform: none !important;
+        transition: opacity 1.2s ease-out !important;
+        order: 2 !important; /* Ensure content appears after fish */
+        justify-content: center;
+        align-items: center;
+      }
+
+      .hero-content.visible {
+        opacity: 1;
+        transform: none !important;
+      }
+
+      .logo-container {
+        display: none; /* Hide logo on mobile */
+      }
+
+      .brand-name {
+        font-size: var(--font-size-xl);
+        margin-bottom: var(--fib-3);
+      }
+
+      .tagline {
+        font-size: var(--font-size-base);
+        margin-bottom: var(--fib-4);
+      }
+
+      .hero-fish svg {
+        width: 65px;
+      }
+
+      .hero-bubble {
+        width: 120px;
+        min-height: 60px;
+        font-size: 10px;
+        padding: var(--fib-2);
+      }
+
+      .hero-fish-pair {
+        gap: var(--fib-2);
+      }
+
+      .value-props {
+        gap: var(--fib-2);
+        margin-bottom: 0;
+      }
+
+      .value-prop {
+        font-size: var(--font-size-xs);
+        gap: var(--fib-1);
+      }
+
+      .value-prop svg {
+        width: var(--fib-2);
+        height: var(--fib-2);
+      }
+
+      .signup-section {
+        padding: var(--fib-6) var(--fib-4);
+        gap: var(--fib-5);
+      }
+
+      .signup-title {
+        font-size: var(--font-size-xl);
+        margin-bottom: var(--fib-2);
+      }
+
+      .signup-subtitle {
+        font-size: var(--font-size-base);
+        margin-bottom: var(--fib-4);
+      }
+
+      .match-stack-container {
+        height: 320px;
+        margin-top: var(--fib-4);
+      }
+
+      .match-card {
+        width: 160px;
+        height: 260px;
+      }
+
+      .learn-more-section {
+        padding: var(--fib-5) var(--fib-3);
+        gap: var(--fib-4);
       }
 
       .phone-mockup {
@@ -1474,16 +1663,402 @@
       }
 
       .big-fish svg {
-        width: 150px;
+        width: 160px;
+      }
+
+      .cowboy-hat {
+        width: var(--fib-4);
+        height: var(--fib-3);
+        left: 24px;
+        top: -3px;
+      }
+
+      .snail-icon {
+        height: var(--fib-4);
+        left: calc(var(--fib-4) * -1);
+      }
+
+      .movie-tickets {
+        width: var(--fib-4);
+        height: var(--fib-4);
+        right: calc(var(--fib-4) * -1);
+      }
+
+      .scratch-box {
+        width: 68px;
+        height: 42px;
+      }
+
+      .bobbers-container {
+        gap: var(--fib-5);
+        bottom: var(--fib-3);
+      }
+
+      .bobber {
+        width: 42px;
+        height: 68px;
+      }
+
+      .bobber-body {
+        width: 42px;
+        height: 42px;
+      }
+
+      .fishing-line {
+        height: 68px;
+      }
+    }
+
+    /* Mobile Phones */
+    @media (max-width: 480px) {
+      .hero {
+        padding: var(--fib-2) var(--fib-2) var(--fib-3);
+        padding-bottom: calc(var(--fib-5) + var(--fib-3));
+        gap: var(--fib-4);
+        min-height: 100vh;
+        justify-content: center;
+      }
+
+      /* Fish container - always first on mobile */
+      .hero-fish-container {
+        order: 1 !important;
+      }
+
+      .hero-fish-container.final-position {
+        order: 1 !important; /* Fish appear first */
+        margin-bottom: var(--fib-4);
+        margin-top: 0;
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        transform: none !important;
+      }
+
+      .hero-content {
+        gap: var(--fib-2);
+        /* Mobile: Fade in only, no transform */
+        opacity: 0;
+        transform: none !important;
+        transition: opacity 1.2s ease-out !important;
+        order: 2 !important; /* Ensure content appears after fish */
+        justify-content: center;
+        align-items: center;
+      }
+
+      .hero-content.visible {
+        opacity: 1;
+        transform: none !important;
+      }
+
+      .logo-container {
+        display: none; /* Hide logo on mobile */
+      }
+
+      .brand-name {
+        font-size: var(--font-size-xl);
+        margin-bottom: var(--fib-2);
+      }
+
+      .tagline {
+        font-size: var(--font-size-sm);
+        margin-bottom: var(--fib-3);
+      }
+
+      .hero-fish svg {
+        width: 55px;
+      }
+
+      .hero-bubble {
+        width: 110px;
+        min-height: 55px;
+        font-size: 9px;
+        padding: var(--fib-1) var(--fib-2);
+      }
+
+      .hero-fish-pair {
+        gap: var(--fib-2);
+      }
+
+      .conversation-label {
+        font-size: var(--font-size-lg);
+        top: -120px;
+      }
+
+      .value-props {
+        gap: var(--fib-2);
+        margin-bottom: 0;
+      }
+
+      .value-prop {
+        font-size: var(--font-size-xs);
+        gap: var(--fib-1);
+      }
+
+      .value-prop svg {
+        width: var(--fib-2);
+        height: var(--fib-2);
+      }
+
+      .signup-section {
+        padding: var(--fib-5) var(--fib-3);
+        gap: var(--fib-4);
+      }
+
+      .signup-title {
+        font-size: var(--font-size-lg);
+        margin-bottom: var(--fib-2);
+      }
+
+      .signup-subtitle {
+        font-size: var(--font-size-sm);
+        margin-bottom: var(--fib-3);
+      }
+
+      .pearl-offer {
+        padding: var(--fib-2) var(--fib-3);
+        margin-bottom: var(--fib-2);
+      }
+
+      .pearl {
+        width: var(--fib-2);
+        height: var(--fib-2);
+      }
+
+      .pearl-text {
+        font-size: var(--font-size-xs);
+      }
+
+      .email-input,
+      .submit-btn {
+        padding: var(--fib-2) var(--fib-3);
+        font-size: var(--font-size-sm);
+      }
+
+      .signup-form {
+        flex-direction: column;
+      }
+
+      .match-stack-container {
+        height: 280px;
+        margin-top: var(--fib-3);
+      }
+
+      .match-card {
+        width: 144px;
+        height: 233px;
+      }
+
+      .match-card .profile-name,
+      .match-card .profile-age {
+        font-size: 14px;
+      }
+
+      .learn-more-section {
+        padding: var(--fib-5) var(--fib-3);
+        gap: var(--fib-3);
+      }
+
+      .section-subtitle {
+        font-size: var(--font-size-base);
+        margin-bottom: var(--fib-4);
+      }
+
+      .phone-mockup {
+        width: 200px;
+        height: 400px;
+        padding: 10px;
+      }
+
+      .phone-mockup::before {
+        width: 60px;
+        height: 16px;
+        top: 6px;
+      }
+
+      .chat-header {
+        padding: var(--fib-1) var(--fib-2);
+      }
+
+      .chat-avatar {
+        width: 26px;
+        height: 26px;
+      }
+
+      .chat-avatar svg {
+        width: 16px;
+      }
+
+      .chat-name {
+        font-size: 11px;
+      }
+
+      .chat-msg {
+        font-size: 11px;
+        padding: var(--fib-1) var(--fib-2);
+      }
+
+      .big-fish svg {
+        width: 130px;
+      }
+
+      .cowboy-hat {
+        width: var(--fib-3);
+        height: var(--fib-2);
+        left: 20px;
+        top: -2px;
+      }
+
+      .snail-icon {
+        height: var(--fib-3);
+        left: calc(var(--fib-3) * -1);
+      }
+
+      .movie-tickets {
+        width: var(--fib-3);
+        height: var(--fib-3);
+        right: calc(var(--fib-3) * -1);
       }
 
       .scratch-boxes {
         flex-wrap: wrap;
         justify-content: center;
+        gap: var(--fib-2);
+        margin-top: var(--fib-3);
+      }
+
+      .scratch-box {
+        width: 55px;
+        height: 34px;
+      }
+
+      .scratch-label {
+        font-size: 7px;
+        margin-bottom: 2px;
+      }
+
+      .scratch-value {
+        font-size: 9px;
       }
 
       .bobbers-container {
-        gap: var(--fib-5);
+        gap: var(--fib-4);
+        bottom: var(--fib-2);
+      }
+
+      .bobber-label {
+        font-size: var(--font-size-sm);
+        margin-bottom: var(--fib-2);
+      }
+
+      .bobber {
+        width: 34px;
+        height: 55px;
+      }
+
+      .bobber-top {
+        width: 16px;
+        height: 10px;
+      }
+
+      .bobber-body {
+        width: 34px;
+        height: 34px;
+      }
+
+      .fishing-line {
+        height: 55px;
+      }
+
+      .skip-intro {
+        bottom: var(--fib-2);
+        right: var(--fib-2);
+        padding: var(--fib-1) var(--fib-2);
+        font-size: 10px;
+      }
+
+      footer {
+        flex-direction: column;
+        gap: var(--fib-2);
+        text-align: center;
+        padding: var(--fib-3) var(--fib-4);
+      }
+
+      .footer-logo svg {
+        width: var(--fib-3);
+      }
+
+      .footer-text {
+        font-size: 10px;
+      }
+
+      .wave-separator {
+        height: var(--fib-4);
+      }
+    }
+
+    /* Very Small Phones */
+    @media (max-width: 360px) {
+      .hero {
+        padding: var(--fib-2);
+        padding-bottom: calc(var(--fib-4) + var(--fib-2));
+        gap: var(--fib-2);
+      }
+
+      .brand-name {
+        font-size: var(--font-size-lg);
+      }
+
+      .hero-fish svg {
+        width: 50px;
+      }
+
+      .hero-bubble {
+        width: 100px;
+        min-height: 50px;
+        font-size: 8px;
+      }
+
+      .match-card {
+        width: 120px;
+        height: 195px;
+      }
+
+      .phone-mockup {
+        width: 180px;
+        height: 360px;
+      }
+
+      .big-fish svg {
+        width: 110px;
+      }
+
+      .scratch-box {
+        width: 45px;
+        height: 28px;
+      }
+    }
+
+    /* Landscape Orientation */
+    @media (max-height: 600px) and (orientation: landscape) {
+      .hero {
+        min-height: auto;
+        padding: var(--fib-3) var(--fib-4);
+        gap: var(--fib-3);
+        padding-bottom: calc(var(--fib-5) + var(--fib-3));
+      }
+
+      .hero-fish svg {
+        width: 50px;
+      }
+
+      .hero-bubble {
+        width: 100px;
+        min-height: 50px;
+        font-size: 9px;
+      }
+
+      .bobbers-container {
+        bottom: var(--fib-2);
       }
     }
   </style>
@@ -1884,7 +2459,9 @@
 
     // Create chaotic fish
     function createChaoticFish() {
-      const fishCount = 100;
+      // Reduce fish count on mobile for better performance
+      const isMobile = window.innerWidth <= 768;
+      const fishCount = isMobile ? 50 : 100;
       const bubbleChance = 0.30; // 30% of fish get speech bubbles
       
       for (let i = 0; i < fishCount; i++) {
@@ -1936,24 +2513,36 @@
       }
     }
 
-    // Calculate where the fish should end up in the grid
+    // Calculate where the fish should end up
     function getTargetPosition() {
-      // Temporarily make the container relative to measure where it should be
       const hero = document.querySelector('.hero');
       const heroRect = hero.getBoundingClientRect();
-      const gap = 89; // --fib-6
-      const padding = 89; // --fib-6
+      const isMobile = window.innerWidth <= 968;
       
-      // Calculate right column center (grid is 1fr 1fr with gap)
-      const columnWidth = (heroRect.width - gap - (padding * 2)) / 2;
-      const rightColumnLeft = heroRect.left + padding + columnWidth + gap;
-      const rightColumnCenter = rightColumnLeft + (columnWidth / 2);
-      const verticalCenter = heroRect.top + (heroRect.height / 2);
-      
-      return {
-        left: rightColumnCenter,
-        top: verticalCenter
-      };
+      if (isMobile) {
+        // Mobile: Fish positioned much lower - use viewport percentage
+        // Start from center (50%) and move DOWN to ~25% from top
+        const viewportHeight = window.innerHeight;
+        return {
+          left: heroRect.left + (heroRect.width / 2),
+          top: heroRect.top + (viewportHeight * 0.25) // 25% from top - much lower
+        };
+      } else {
+        // Desktop: Fish slide to right column (original behavior)
+        const gap = 89; // --fib-6
+        const padding = 89; // --fib-6
+        
+        // Calculate right column center (grid is 1fr 1fr with gap)
+        const columnWidth = (heroRect.width - gap - (padding * 2)) / 2;
+        const rightColumnLeft = heroRect.left + padding + columnWidth + gap;
+        const rightColumnCenter = rightColumnLeft + (columnWidth / 2);
+        const verticalCenter = heroRect.top + (heroRect.height / 2);
+        
+        return {
+          left: rightColumnCenter,
+          top: verticalCenter
+        };
+      }
     }
 
     // Animation timeline
@@ -2015,17 +2604,54 @@
         fishConversation.classList.add('final-size');
         
         // Animate fish container to target position (stays fixed during animation)
+        const isMobile = window.innerWidth <= 968;
         fishContainer.style.top = target.top + 'px';
         fishContainer.style.left = target.left + 'px';
-        fishContainer.style.transform = 'translate(-50%, -50%)'; // Keep centered on target point
         
-        // After animation completes, switch to relative positioning
-        // (floating animation and conversation cycling already started in Phase 2)
-        setTimeout(() => {
-          fishContainer.classList.add('final-position');
-        }, 1500);
+        if (isMobile) {
+          // Mobile: Center horizontally, align to top (no vertical centering)
+          fishContainer.style.transform = 'translate(-50%, 0)';
+          
+          // After animation completes, smoothly transition to relative positioning
+          setTimeout(() => {
+            // Capture the exact visual position before switching
+            const rect = fishContainer.getBoundingClientRect();
+            const heroRect = hero.getBoundingClientRect();
+            const visualTop = rect.top - heroRect.top;
+            
+            // Add final-position class
+            fishContainer.classList.add('final-position');
+            
+            // Immediately set margin-top to match visual position to prevent jump
+            requestAnimationFrame(() => {
+              fishContainer.style.marginTop = visualTop + 'px';
+              fishContainer.style.top = '';
+              fishContainer.style.left = '';
+              fishContainer.style.transform = '';
+              
+              // Smoothly transition margin-top to CSS value
+              setTimeout(() => {
+                fishContainer.style.transition = 'margin-top 0.5s ease-out';
+                fishContainer.style.marginTop = '';
+                
+                // Clear transition after animation
+                setTimeout(() => {
+                  fishContainer.style.transition = '';
+                }, 500);
+              }, 50);
+            });
+          }, 1500);
+        } else {
+          // Desktop: Keep centered on target point (original behavior)
+          fishContainer.style.transform = 'translate(-50%, -50%)';
+          
+          // After animation completes, switch to relative positioning
+          setTimeout(() => {
+            fishContainer.classList.add('final-position');
+          }, 1500);
+        }
         
-        // Slide in hero content from left
+        // Show hero content (fade in on mobile, slide on desktop)
         setTimeout(() => {
           heroContent.classList.add('visible');
         }, 300);
@@ -2148,6 +2774,20 @@
 
     // Start animation on load
     window.addEventListener('load', runAnimation);
+
+    // Handle window resize for responsive positioning
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        // If fish are already in final position, recalculate
+        if (fishContainer.classList.contains('final-position')) {
+          const target = getTargetPosition();
+          fishContainer.style.left = target.left + 'px';
+          fishContainer.style.top = target.top + 'px';
+        }
+      }, 250);
+    });
 
     // ============================================
     // MATCH CARD STACK ANIMATION
