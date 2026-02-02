@@ -1518,6 +1518,13 @@
       /* Fish container - always first on mobile */
       .hero-fish-container {
         order: 1 !important;
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        --mobile-fish-offset: 50px;
+        transform: translateY(var(--mobile-fish-offset)) !important;
+        transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        will-change: transform;
       }
 
       .hero-fish-container.final-position {
@@ -1666,16 +1673,28 @@
       /* Fish container - always first on mobile */
       .hero-fish-container {
         order: 1 !important;
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        margin-bottom: var(--fib-4);
+        --mobile-fish-offset: 60px;
+        transform: translateY(var(--mobile-fish-offset)) !important;
+        transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        will-change: transform;
       }
 
       .hero-fish-container.final-position {
         order: 1 !important; /* Fish appear first */
-        margin-bottom: var(--fib-4);
         margin-top: 0;
         position: relative !important;
         top: auto !important;
         left: auto !important;
-        transform: none !important;
+        transform: translateY(var(--mobile-fish-offset)) !important;
+      }
+
+      .hero-fish-conversation {
+        transition: opacity 0.8s ease-out,
+                    transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       .hero-content {
@@ -1807,16 +1826,16 @@
       /* Fish container - always first on mobile */
       .hero-fish-container {
         order: 1 !important;
+        margin-bottom: var(--fib-4);
       }
 
       .hero-fish-container.final-position {
         order: 1 !important; /* Fish appear first */
-        margin-bottom: var(--fib-4);
         margin-top: 0;
         position: relative !important;
         top: auto !important;
         left: auto !important;
-        transform: none !important;
+        transform: translateY(var(--mobile-fish-offset)) !important;
       }
 
       .hero-content {
@@ -2030,6 +2049,10 @@
         letter-spacing: 0.5px;
         white-space: nowrap;
         padding: 0 var(--fib-1);
+      }
+
+      .hero-fish-container {
+        --mobile-fish-offset: 45px;
       }
 
       .hero {
@@ -2571,7 +2594,7 @@
     function getTargetPosition() {
       const hero = document.querySelector('.hero');
       const heroRect = hero.getBoundingClientRect();
-      const isMobile = window.innerWidth <= 968;
+      const isMobile = window.innerWidth <= 768;
       
       if (isMobile) {
         // Mobile: Fish stay centered - return current center position (not used, but kept for compatibility)
@@ -2651,22 +2674,28 @@
         
         // Calculate target position BEFORE animating
         const target = getTargetPosition();
-        const isMobile = window.innerWidth <= 968;
-        
-        // Shrink fish to final size
-        fishConversation.classList.add('final-size');
+      const isMobile = window.innerWidth <= 768;
         
         if (isMobile) {
-          // Mobile: Fish stay in their current centered position - don't move at all
-          // Just shrink and add final-position class immediately
+          // Pause float to avoid animation snapping during scale down
+          fishConversation.classList.remove('animate-float');
+        }
+
+        // Shrink fish to final size
+        fishConversation.classList.add('final-size');
+
+        if (isMobile) {
+          // Resume float after the scale transition finishes
           setTimeout(() => {
-            // Add final-position class to switch to relative positioning
+            fishConversation.classList.add('animate-float');
+          }, 1500);
+        }
+        
+        if (isMobile) {
+          // Mobile: Smooth upward movement using transform only (no layout jumps)
+          fishContainer.style.setProperty('--mobile-fish-offset', '0px');
+          setTimeout(() => {
             fishContainer.classList.add('final-position');
-            
-            // Ensure fish stay centered in their container
-            fishContainer.style.top = '';
-            fishContainer.style.left = '';
-            fishContainer.style.transform = '';
           }, 1500);
         } else {
           // Desktop: Animate fish container to target position (stays fixed during animation)
@@ -2680,15 +2709,17 @@
           }, 1500);
         }
         
-        // Show hero content (fade in on mobile, slide on desktop)
+        // Show hero content (fade in below fish on mobile)
+        const heroDelay = isMobile ? 1500 : 300;
         setTimeout(() => {
           heroContent.classList.add('visible');
-        }, 300);
+        }, heroDelay);
         
         // Stagger in value props
-        setTimeout(() => prop1.classList.add('visible'), 800);
-        setTimeout(() => prop2.classList.add('visible'), 1000);
-        setTimeout(() => prop3.classList.add('visible'), 1200);
+        const propBase = isMobile ? 1900 : 800;
+        setTimeout(() => prop1.classList.add('visible'), propBase);
+        setTimeout(() => prop2.classList.add('visible'), propBase + 200);
+        setTimeout(() => prop3.classList.add('visible'), propBase + 400);
         
         // Show signup section
         setTimeout(() => {
@@ -2716,6 +2747,8 @@
       introLabel.classList.add('fade-out');
       conversationLabel.classList.add('fade-out');
       
+      const isMobile = window.innerWidth <= 768;
+
       // Set fish to final state (skip animation)
       fishContainer.style.transition = 'none';
       fishConversation.style.transition = 'none';
@@ -2725,6 +2758,10 @@
       fishConversation.classList.add('animate-float');
       bubble1.classList.add('visible');
       bubble2.classList.add('visible');
+
+      if (isMobile) {
+        fishContainer.style.setProperty('--mobile-fish-offset', '0px');
+      }
       
       // Start conversation cycling
       startConversationCycle();
