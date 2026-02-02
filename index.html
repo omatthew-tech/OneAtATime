@@ -1613,13 +1613,30 @@
       }
 
       .match-stack-container {
-        height: 380px;
-        margin-top: var(--fib-5);
+        height: calc(var(--fib-8) + var(--fib-6));
+        margin-top: var(--fib-4);
       }
 
       .match-card {
-        width: 180px;
-        height: 300px;
+        width: var(--fib-7);
+        height: var(--fib-8);
+      }
+
+      /* Mobile stack: show more of the cards */
+      .match-card:nth-child(1) {
+        transform: translateX(0) translateY(0) scale(1);
+      }
+      .match-card:nth-child(2) {
+        transform: translateX(calc(var(--fib-2) * -1)) translateY(var(--fib-4)) scale(0.95);
+        opacity: 0.85;
+      }
+      .match-card:nth-child(3) {
+        transform: translateX(calc(var(--fib-3) * -1)) translateY(var(--fib-5)) scale(0.9);
+        opacity: 0.7;
+      }
+      .match-card:nth-child(4) {
+        transform: translateX(calc(var(--fib-4) * -1)) translateY(var(--fib-6)) scale(0.85);
+        opacity: 0.55;
       }
 
       .learn-more-section {
@@ -1823,6 +1840,10 @@
         justify-content: center;
       }
 
+      .signup-section {
+        padding: var(--fib-6) var(--fib-4) var(--fib-5);
+      }
+
       /* Fish container - always first on mobile */
       .hero-fish-container {
         order: 1 !important;
@@ -2015,6 +2036,11 @@
         height: 55px;
       }
 
+      .match-stack-container {
+        height: calc(var(--fib-8) + var(--fib-6));
+        margin-top: var(--fib-4);
+      }
+
       .skip-intro {
         bottom: var(--fib-2);
         right: var(--fib-2);
@@ -2061,6 +2087,15 @@
         gap: var(--fib-2);
       }
 
+      .signup-section {
+        padding: var(--fib-5) var(--fib-3) var(--fib-4);
+      }
+
+      .match-stack-container {
+        height: calc(var(--fib-8) + var(--fib-6));
+        margin-top: var(--fib-3);
+      }
+
       .brand-name {
         font-size: var(--font-size-lg);
       }
@@ -2075,20 +2110,6 @@
         font-size: 8px;
       }
 
-      .signup-section {
-        grid-template-columns: 1fr;
-        text-align: center;
-      }
-
-      .match-stack-container {
-        height: 380px;
-        margin-top: var(--fib-5);
-      }
-
-      .match-card {
-        width: 180px;
-        height: 300px;
-      }
 
       .phone-mockup {
         width: 180px;
@@ -2817,7 +2838,8 @@
       conversationInterval = setInterval(updateConversation, 7000);
     }
 
-    // Form submission
+    // Form submission – emails sent to Formspree
+    const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mzdvvqpv';
     document.getElementById('signupForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const email = this.querySelector('input').value;
@@ -2828,6 +2850,13 @@
       // Disable form during submission
       btn.disabled = true;
       input.disabled = true;
+      
+      // Send to Formspree
+      fetch(FORMSPREE_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email })
+      }).catch(function() { /* fail silently; user still sees success */ });
       
       // Animate pearls
       const pearls = document.querySelectorAll('.pearl');
@@ -2858,9 +2887,6 @@
         input.value = '';
         input.focus();
       }, 3000);
-      
-      console.log('Email submitted:', email);
-      // TODO: Connect to actual email collection service
     });
 
     // Pearl pulse animation for success
