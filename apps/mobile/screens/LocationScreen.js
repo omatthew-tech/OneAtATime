@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import Svg, { Path as SvgPath } from "react-native-svg";
 import OnboardingLayout from "../components/OnboardingLayout";
+import { normalizeCountry } from "../lib/api";
 import {
   colors,
   spacing,
@@ -68,7 +69,7 @@ export default function LocationScreen({ initialLocation, initialHidden, initial
       if (geo) {
         const parts = [geo.city, geo.region].filter(Boolean);
         setLocationText(parts.join(", ") || "");
-        setCountry(geo.country || geo.isoCountryCode || "");
+        setCountry(normalizeCountry(geo.isoCountryCode || geo.country || ""));
       }
     } catch (e) {
       console.warn("Location error:", e);

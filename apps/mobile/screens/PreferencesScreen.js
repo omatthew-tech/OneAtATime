@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import Svg, { Path as SvgPath } from "react-native-svg";
 import { colors, spacing, typography, radius, sizes } from "../theme";
+import { normalizeCountry } from "../lib/api";
 
 let Location = null;
 try {
@@ -276,7 +277,8 @@ export default function PreferencesScreen({ preferences, locationHidden, onSave,
       });
       if (geo) {
         const parts = [geo.city, geo.region].filter(Boolean);
-        setPrefs((p) => ({ ...p, location: parts.join(", ") || "" }));
+        const country = normalizeCountry(geo.isoCountryCode || geo.country || "");
+        setPrefs((p) => ({ ...p, location: parts.join(", ") || "", country }));
       }
     } catch (e) {
       console.warn("Location error:", e);

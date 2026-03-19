@@ -2,7 +2,7 @@ import { useState } from "react";
 import OnboardingLayout from "../components/OnboardingLayout";
 import OptionList from "../components/OptionList";
 
-const OPTIONS = ["Introvert", "Omnivert", "Extrovert"];
+const OPTIONS = ["Introvert", "Ambivert", "Extrovert"];
 
 export default function IntroversionScreen({ initialValue = "Introvert", onNext, onBack, onUpdate }) {
   const [selected, setSelected] = useState(initialValue);

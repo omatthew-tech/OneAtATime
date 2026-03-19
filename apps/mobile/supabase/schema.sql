@@ -11,7 +11,7 @@ create table public.profiles (
   name text not null,
   age integer not null check (age >= 18 and age <= 120),
   gender text not null check (gender in ('Man', 'Woman', 'Nonbinary')),
-  introversion text not null check (introversion in ('Introvert', 'Omnivert', 'Extrovert')),
+  introversion text not null check (introversion in ('Introvert', 'Ambivert', 'Extrovert')),
   bio text default '',
   location_text text default '',
   latitude double precision,

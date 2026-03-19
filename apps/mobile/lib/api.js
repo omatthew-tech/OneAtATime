@@ -14,6 +14,19 @@ const COUNTRY_NAMES = {
   IL: "Israel", AE: "United Arab Emirates", SA: "Saudi Arabia", PK: "Pakistan",
 };
 
+const NAME_TO_CODE = Object.fromEntries(
+  Object.entries(COUNTRY_NAMES).map(([code, name]) => [name.toLowerCase(), code])
+);
+
+export function normalizeCountry(raw) {
+  if (!raw) return "";
+  const upper = raw.toUpperCase();
+  if (COUNTRY_NAMES[upper]) return upper;
+  const lower = raw.toLowerCase();
+  if (NAME_TO_CODE[lower]) return NAME_TO_CODE[lower];
+  return raw;
+}
+
 function displayCountry(raw) {
   if (!raw) return "";
   return COUNTRY_NAMES[raw] || COUNTRY_NAMES[raw.toUpperCase()] || raw;
@@ -156,13 +169,15 @@ export async function checkMutualMatch(swiperId, targetId) {
 
   if (!data) return null;
 
-  // Mutual — create a match
+  const deadline = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+
   const { data: match, error } = await supabase
     .from("matches")
     .insert({
       user_a: swiperId < targetId ? swiperId : targetId,
       user_b: swiperId < targetId ? targetId : swiperId,
       status: "active",
+      timer_deadline: deadline,
     })
     .select()
     .single();
@@ -178,7 +193,7 @@ export async function fetchActiveMatch(profileId) {
   const { data, error } = await supabase
     .from("matches")
     .select(`
-      id, status, started_at, user_a, user_b,
+      id, status, started_at, user_a, user_b, timer_deadline, last_sender_id,
       profiles_a:profiles!matches_user_a_fkey(id, name, age, gender, introversion, bio, location_text, location_hidden, country, height, job, school, religion, hometown, politics, language),
       profiles_b:profiles!matches_user_b_fkey(id, name, age, gender, introversion, bio, location_text, location_hidden, country, height, job, school, religion, hometown, politics, language)
     `)
@@ -213,6 +228,8 @@ export async function fetchActiveMatch(profileId) {
 
   return {
     matchId: data.id,
+    timerDeadline: data.timer_deadline,
+    lastSenderId: data.last_sender_id,
     profile: {
       ...otherProfile,
       location: displayLocation,
@@ -225,7 +242,7 @@ export async function fetchActiveMatch(profileId) {
 export async function fetchMessages(matchId) {
   const { data, error } = await supabase
     .from("messages")
-    .select("id, sender_id, body, created_at")
+    .select("id, sender_id, body, created_at, liked_by")
     .eq("match_id", matchId)
     .order("created_at", { ascending: true });
 
@@ -257,6 +274,17 @@ export async function endMatch(matchId) {
     .eq("id", matchId);
 
   if (error) console.error("endMatch:", error.message);
+}
+
+export async function resetMatchTimer(matchId, senderId) {
+  const deadline = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+  const { error } = await supabase
+    .from("matches")
+    .update({ timer_deadline: deadline, last_sender_id: senderId })
+    .eq("id", matchId);
+
+  if (error) console.error("resetMatchTimer:", error.message);
+  return deadline;
 }
 
 export async function savePreferences(profileId, prefs) {
@@ -330,6 +358,16 @@ export async function linkEmail(profileId, email) {
 }
 
 export async function deleteAccount(profileId) {
+  const { data: photos } = await supabase
+    .from("photos")
+    .select("storage_path")
+    .eq("profile_id", profileId);
+
+  if (photos && photos.length > 0) {
+    const paths = photos.map((p) => p.storage_path);
+    await supabase.storage.from("photos").remove(paths);
+  }
+
   const { error } = await supabase
     .from("profiles")
     .delete()
@@ -403,6 +441,23 @@ export async function upsertPushToken(profileId, token, platform) {
       { onConflict: "token" }
     );
   if (error) console.error("upsertPushToken:", error.message);
+}
+
+export async function toggleMessageLike(messageId, profileId) {
+  const { data: msg } = await supabase
+    .from("messages")
+    .select("liked_by")
+    .eq("id", messageId)
+    .single();
+
+  const newVal = msg?.liked_by === profileId ? null : profileId;
+  const { error } = await supabase
+    .from("messages")
+    .update({ liked_by: newVal })
+    .eq("id", messageId);
+
+  if (error) console.error("toggleMessageLike:", error.message);
+  return newVal;
 }
 
 export async function sendPushNotification(recipientId, title, body, data = {}) {

@@ -1,5 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import {
+  FlatList,
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -10,6 +12,7 @@ import {
 import Svg, { Circle, Path as SvgPath } from "react-native-svg";
 import OnboardingLayout from "../components/OnboardingLayout";
 import OptionList from "../components/OptionList";
+import { upsertPrompt } from "../lib/api";
 import {
   colors,
   spacing,
@@ -19,6 +22,21 @@ import {
   sizes,
 } from "../theme";
 
+const ALL_PROMPTS = [
+  "Typical Sunday",
+  "To me, relaxation is",
+  "I wind down by",
+  "My simple pleasures",
+  "I geek out on",
+  "The one thing you should know about me is",
+  "A boundary of mine is",
+  "Something that's non-negotiable for me is",
+  "I feel most supported when",
+  "The hallmark of a good relationship is",
+  "Together, we could",
+  "The best way to ask me out is by",
+];
+
 const STEPS = [
   { key: "height", title: "How tall are you?" },
   { key: "bio", title: "Write a short bio" },
@@ -26,7 +44,10 @@ const STEPS = [
   { key: "school", title: "Where did you study?" },
   { key: "religion", title: "What's your faith?" },
   { key: "politics", title: "What are your political views?" },
+  { key: "prompts", title: "Add your prompts" },
 ];
+
+const PROMPT_SLOTS = 3;
 
 const RELIGION_OPTIONS = [
   "Christian",
@@ -220,8 +241,14 @@ const hStyles = StyleSheet.create({
 
 function getFirstIncompleteStep(profile) {
   for (let i = 0; i < STEPS.length; i++) {
-    const val = profile[STEPS[i].key];
-    if (!val || !String(val).trim()) return i;
+    const key = STEPS[i].key;
+    if (key === "prompts") {
+      const filled = (profile.prompts || []).filter((p) => p.answer && p.answer.trim());
+      if (filled.length === 0) return i;
+    } else {
+      const val = profile[key];
+      if (!val || !String(val).trim()) return i;
+    }
   }
   return STEPS.length - 1;
 }
@@ -237,16 +264,64 @@ export default function ProfileCompletionScreen({ profile, onComplete, onCancel,
     politics: profile.politics || "",
   });
 
+  const existingPrompts = profile.prompts || [];
+  const [prompts, setPrompts] = useState(() => {
+    const slots = [];
+    for (let i = 0; i < PROMPT_SLOTS; i++) {
+      const existing = existingPrompts[i];
+      slots.push({
+        prompt_text: existing?.prompt_text || "",
+        answer: existing?.answer || "",
+      });
+    }
+    return slots;
+  });
+  const [editingSlot, setEditingSlot] = useState(-1);
+  const [showPromptPicker, setShowPromptPicker] = useState(false);
+  const [editAnswer, setEditAnswer] = useState("");
+
   const current = STEPS[step];
-  const val = fields[current.key];
-  const canContinue = !!val && val.trim().length > 0;
+
+  const canContinue = (() => {
+    if (current.key === "prompts") {
+      return prompts.some((p) => p.prompt_text && p.answer.trim());
+    }
+    const val = fields[current.key];
+    return !!val && val.trim().length > 0;
+  })();
 
   const update = useCallback((key, value) => {
     setFields((prev) => ({ ...prev, [key]: value }));
   }, []);
 
-  const handleNext = () => {
+  const buildPromptsList = useCallback(() => {
+    return prompts
+      .filter((p) => p.prompt_text && p.answer.trim())
+      .map((p, i) => ({
+        prompt_text: p.prompt_text,
+        answer: p.answer.trim(),
+        display_order: i,
+      }));
+  }, [prompts]);
+
+  const savePrompts = useCallback(async () => {
+    for (let i = 0; i < PROMPT_SLOTS; i++) {
+      const p = prompts[i];
+      if (p.prompt_text && p.answer.trim()) {
+        await upsertPrompt(profile.id, p.prompt_text, p.answer.trim(), i);
+      }
+    }
+  }, [prompts, profile.id]);
+
+  const handleNext = async () => {
     const key = current.key;
+
+    if (key === "prompts") {
+      await savePrompts();
+      onComplete({ ...fields, prompts: buildPromptsList() });
+      return;
+    }
+
     const value = fields[key];
     if (value && String(value).trim()) {
       onSavePartial?.({ [key]: value });
@@ -259,11 +334,17 @@ export default function ProfileCompletionScreen({ profile, onComplete, onCancel,
     }
   };
 
-  const handleBack = () => {
+  const handleBack = async () => {
     const key = current.key;
-    const value = fields[key];
-    if (value && String(value).trim()) {
-      onSavePartial?.({ [key]: value });
+
+    if (key === "prompts") {
+      await savePrompts();
+      onSavePartial?.({ prompts: buildPromptsList() });
+    } else {
+      const value = fields[key];
+      if (value && String(value).trim()) {
+        onSavePartial?.({ [key]: value });
+      }
     }
 
     if (step === 0) {
@@ -325,6 +406,101 @@ export default function ProfileCompletionScreen({ profile, onComplete, onCancel,
           </ScrollView>
         );
 
+      case "prompts": {
+        const usedPrompts = prompts.map((p) => p.prompt_text).filter(Boolean);
+        const available = ALL_PROMPTS.filter((p) => !usedPrompts.includes(p));
+
+        return (
+          <View style={pStyles.wrap}>
+            <Text style={pStyles.hint}>Add at least 1 prompt (up to 3)</Text>
+            {prompts.map((slot, i) => (
+              <View key={i} style={pStyles.card}>
+                {slot.prompt_text ? (
+                  <View>
+                    <View style={pStyles.promptHeader}>
+                      <Text style={pStyles.promptText}>{slot.prompt_text}</Text>
+                      <Pressable
+                        onPress={() => {
+                          setEditingSlot(i);
+                          setShowPromptPicker(true);
+                        }}
+                      >
+                        <Text style={pStyles.changeLink}>Change</Text>
+                      </Pressable>
+                    </View>
+                    <TextInput
+                      style={pStyles.answerInput}
+                      placeholder="Your answer..."
+                      placeholderTextColor={colors.textMuted}
+                      value={slot.answer}
+                      onChangeText={(t) =>
+                        setPrompts((prev) =>
+                          prev.map((p, j) => (j === i ? { ...p, answer: t } : p))
+                        )
+                      }
+                      multiline
+                      blurOnSubmit
+                      returnKeyType="done"
+                      maxLength={200}
+                    />
+                  </View>
+                ) : (
+                  <Pressable
+                    style={pStyles.addButton}
+                    onPress={() => {
+                      setEditingSlot(i);
+                      setShowPromptPicker(true);
+                    }}
+                  >
+                    <Text style={pStyles.addPlus}>+</Text>
+                    <Text style={pStyles.addLabel}>Add a prompt</Text>
+                  </Pressable>
+                )}
+              </View>
+            ))}
+
+            <Modal
+              visible={showPromptPicker}
+              transparent
+              animationType="slide"
+              onRequestClose={() => setShowPromptPicker(false)}
+            >
+              <View style={pStyles.pickerOverlay}>
+                <View style={pStyles.pickerSheet}>
+                  <View style={pStyles.pickerHeader}>
+                    <Text style={pStyles.pickerTitle}>Select a prompt</Text>
+                    <Pressable onPress={() => setShowPromptPicker(false)}>
+                      <Text style={pStyles.pickerClose}>Cancel</Text>
+                    </Pressable>
+                  </View>
+                  <FlatList
+                    data={available}
+                    keyExtractor={(item) => item}
+                    renderItem={({ item }) => (
+                      <Pressable
+                        style={pStyles.pickerItem}
+                        onPress={() => {
+                          setPrompts((prev) =>
+                            prev.map((p, j) =>
+                              j === editingSlot
+                                ? { prompt_text: item, answer: "" }
+                                : p
+                            )
+                          );
+                          setShowPromptPicker(false);
+                        }}
+                      >
+                        <Text style={pStyles.pickerItemText}>{item}</Text>
+                      </Pressable>
+                    )}
+                  />
+                </View>
+              </View>
+            </Modal>
+          </View>
+        );
+      }
+
       default: {
         const placeholders = {
           job: "e.g., Software Engineer",
@@ -355,7 +531,7 @@ export default function ProfileCompletionScreen({ profile, onComplete, onCancel,
       canContinue={canContinue}
       onBack={handleBack}
       onNext={handleNext}
-      dismissKeyboard={current.key !== "height" && current.key !== "religion" && current.key !== "politics"}
+      dismissKeyboard={current.key !== "height" && current.key !== "religion" && current.key !== "politics" && current.key !== "prompts"}
     >
       {renderContent()}
     </OnboardingLayout>
@@ -387,5 +563,105 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     textAlign: "right",
     marginTop: spacing.xxs,
+  },
+});
+
+const pStyles = StyleSheet.create({
+  wrap: {
+    width: "100%",
+    gap: spacing.sm,
+  },
+  hint: {
+    fontSize: typography.bodySmall,
+    color: colors.textMuted,
+    textAlign: "center",
+    marginBottom: spacing.xxs,
+  },
+  card: {
+    backgroundColor: colors.oceanDeep,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: spacing.sm,
+  },
+  promptHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: spacing.xs,
+  },
+  promptText: {
+    fontSize: typography.bodySmall,
+    fontWeight: "600",
+    color: colors.tealGlow,
+    flex: 1,
+  },
+  changeLink: {
+    fontSize: typography.caption,
+    fontWeight: "600",
+    color: colors.textMuted,
+    marginLeft: spacing.xs,
+  },
+  answerInput: {
+    fontSize: typography.body,
+    color: colors.textPrimary,
+    lineHeight: lineHeights.body,
+    minHeight: 40,
+    padding: 0,
+  },
+  addButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
+    paddingVertical: spacing.xs,
+  },
+  addPlus: {
+    fontSize: typography.title,
+    fontWeight: "300",
+    color: colors.tealGlow,
+  },
+  addLabel: {
+    fontSize: typography.body,
+    color: colors.textMuted,
+  },
+  pickerOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    justifyContent: "flex-end",
+  },
+  pickerSheet: {
+    backgroundColor: colors.oceanDeep,
+    borderTopLeftRadius: radius.lg,
+    borderTopRightRadius: radius.lg,
+    maxHeight: "70%",
+    paddingBottom: spacing.xl,
+  },
+  pickerHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  pickerTitle: {
+    fontSize: typography.subtitle,
+    fontWeight: "700",
+    color: colors.textPrimary,
+  },
+  pickerClose: {
+    fontSize: typography.body,
+    fontWeight: "600",
+    color: colors.textMuted,
+  },
+  pickerItem: {
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  pickerItemText: {
+    fontSize: typography.body,
+    color: colors.textPrimary,
   },
 });

@@ -11,11 +11,8 @@
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
     "@supabase/supabase-js": "^2.99.1",
-    "base64-arraybuffer": "^1.0.2",
     "expo": "~55.0.6",
-    "expo-blur": "~55.0.9",
     "expo-dev-client": "~55.0.16",
-    "expo-file-system": "~55.0.10",
     "expo-image-picker": "~55.0.12",
     "expo-location": "~55.1.2",
     "expo-notifications": "~55.0.12",

@@ -5,6 +5,7 @@ import {
   Dimensions,
   FlatList,
   Image,
+  Linking,
   Modal,
   Pressable,
   SafeAreaView,
@@ -34,6 +35,26 @@ const ALL_PROMPTS = [
   "Together, we could",
   "The best way to ask me out is by",
 ];
+
+const RELIGION_OPTIONS = [
+  "Christian", "Catholic", "Jewish", "Muslim", "Hindu", "Buddhist",
+  "Agnostic", "Atheist", "Spiritual", "Other", "Prefer not to say",
+];
+
+const POLITICS_OPTIONS = [
+  "Liberal", "Moderate", "Conservative", "Not political", "Prefer not to say",
+];
+
+const HEIGHT_OPTIONS = (() => {
+  const h = [];
+  for (let feet = 4; feet <= 7; feet++) {
+    const max = feet === 7 ? 0 : 11;
+    for (let inches = 0; inches <= max; inches++) {
+      h.push(`${feet}\u2032${inches}\u2033`);
+    }
+  }
+  return h;
+})();
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const PHOTO_GAP = spacing.xs;
@@ -116,6 +137,34 @@ function EditModal({ visible, title, value, onSave, onClose, multiline }) {
               <Text style={styles.modalSaveText}>Save</Text>
             </Pressable>
           </View>
+        </Pressable>
+      </Pressable>
+    </Modal>
+  );
+}
+
+function OptionSelectModal({ visible, title, options, selected, onSelect, onClose }) {
+  return (
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+      <Pressable style={styles.modalBackdrop} onPress={onClose}>
+        <Pressable style={styles.modalCard} onPress={(e) => e.stopPropagation()}>
+          <Text style={styles.modalTitle}>{title}</Text>
+          <ScrollView style={styles.optionList} bounces={false}>
+            {options.map((opt) => {
+              const active = selected === opt;
+              return (
+                <Pressable key={opt} style={styles.optionRow} onPress={() => onSelect(opt)}>
+                  <Text style={[styles.optionLabel, active && styles.optionLabelActive]}>{opt}</Text>
+                  <View style={[styles.optionRadio, active && styles.optionRadioActive]}>
+                    {active && <View style={styles.optionDot} />}
+                  </View>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+          <Pressable style={styles.modalCancel} onPress={onClose}>
+            <Text style={styles.modalCancelText}>Cancel</Text>
+          </Pressable>
         </Pressable>
       </Pressable>
     </Modal>
@@ -607,6 +656,41 @@ export default function MeScreen({ profile, onUpdateProfile, onLogout }) {
           </View>
 
           <View style={styles.section}>
+            <SectionHeader title="About Me" />
+            <View style={styles.detailsCard}>
+              <ProfileRow
+                label="Height"
+                value={profile.height || "Not set"}
+                onPress={() => setEditField("height")}
+              />
+              <View style={styles.divider} />
+              <ProfileRow
+                label="Job"
+                value={profile.job || "Not set"}
+                onPress={() => setEditField("job")}
+              />
+              <View style={styles.divider} />
+              <ProfileRow
+                label="School"
+                value={profile.school || "Not set"}
+                onPress={() => setEditField("school")}
+              />
+              <View style={styles.divider} />
+              <ProfileRow
+                label="Religion"
+                value={profile.religion || "Not set"}
+                onPress={() => setEditField("religion")}
+              />
+              <View style={styles.divider} />
+              <ProfileRow
+                label="Politics"
+                value={profile.politics || "Not set"}
+                onPress={() => setEditField("politics")}
+              />
+            </View>
+          </View>
+
+          <View style={styles.section}>
             <SectionHeader title="Account" />
             <View style={styles.detailsCard}>
               <Pressable style={styles.profileRow} onPress={handleLogout}>
@@ -617,6 +701,26 @@ export default function MeScreen({ profile, onUpdateProfile, onLogout }) {
               <Pressable style={styles.profileRow} onPress={handleDeleteAccount}>
                 <Text style={styles.dangerLabel}>Delete account</Text>
                 <ChevronRight color="rgba(255,80,80,0.6)" />
+              </Pressable>
+            </View>
+          </View>
+
+          <View style={styles.section}>
+            <SectionHeader title="Legal" />
+            <View style={styles.detailsCard}>
+              <Pressable style={styles.profileRow} onPress={() => Linking.openURL("https://oneatatime.pages.dev/terms.html")}>
+                <Text style={styles.actionLabel}>Terms of Service</Text>
+                <ChevronRight />
+              </Pressable>
+              <View style={styles.divider} />
+              <Pressable style={styles.profileRow} onPress={() => Linking.openURL("https://oneatatime.pages.dev/privacy.html")}>
+                <Text style={styles.actionLabel}>Privacy Policy</Text>
+                <ChevronRight />
+              </Pressable>
+              <View style={styles.divider} />
+              <Pressable style={styles.profileRow} onPress={() => Linking.openURL("https://oneatatime.pages.dev/guidelines.html")}>
+                <Text style={styles.actionLabel}>Community Guidelines</Text>
+                <ChevronRight />
               </Pressable>
             </View>
           </View>
@@ -664,6 +768,54 @@ export default function MeScreen({ profile, onUpdateProfile, onLogout }) {
           visible
           currentEmail={profile.email}
           onVerified={handleEmailVerified}
+          onClose={() => setEditField(null)}
+        />
+      )}
+      {editField === "job" && (
+        <EditModal
+          visible
+          title="Edit Job"
+          value={profile.job}
+          onSave={(val) => handleSaveField("job", val)}
+          onClose={() => setEditField(null)}
+        />
+      )}
+      {editField === "school" && (
+        <EditModal
+          visible
+          title="Edit School"
+          value={profile.school}
+          onSave={(val) => handleSaveField("school", val)}
+          onClose={() => setEditField(null)}
+        />
+      )}
+      {editField === "height" && (
+        <OptionSelectModal
+          visible
+          title="Edit Height"
+          options={HEIGHT_OPTIONS}
+          selected={profile.height}
+          onSelect={(val) => { handleSaveField("height", val); setEditField(null); }}
+          onClose={() => setEditField(null)}
+        />
+      )}
+      {editField === "religion" && (
+        <OptionSelectModal
+          visible
+          title="Edit Religion"
+          options={RELIGION_OPTIONS}
+          selected={profile.religion}
+          onSelect={(val) => { handleSaveField("religion", val); setEditField(null); }}
+          onClose={() => setEditField(null)}
+        />
+      )}
+      {editField === "politics" && (
+        <OptionSelectModal
+          visible
+          title="Edit Politics"
+          options={POLITICS_OPTIONS}
+          selected={profile.politics}
+          onSelect={(val) => { handleSaveField("politics", val); setEditField(null); }}
           onClose={() => setEditField(null)}
         />
       )}
@@ -922,6 +1074,47 @@ const styles = StyleSheet.create({
 
   bottomSpacer: {
     height: spacing.hero,
+  },
+
+  optionList: {
+    maxHeight: 320,
+    marginBottom: spacing.sm,
+  },
+  optionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  optionLabel: {
+    fontSize: typography.body,
+    color: colors.textPrimary,
+    fontWeight: "500",
+  },
+  optionLabelActive: {
+    color: colors.tealGlow,
+    fontWeight: "700",
+  },
+  optionRadio: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: colors.textMuted,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  optionRadioActive: {
+    borderColor: colors.tealGlow,
+    backgroundColor: colors.tealGlow,
+  },
+  optionDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: colors.oceanAbyss,
   },
 
   pickerContainer: {

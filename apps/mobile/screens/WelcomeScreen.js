@@ -3,6 +3,7 @@ import { StatusBar } from "expo-status-bar";
 import {
   Keyboard,
   KeyboardAvoidingView,
+  Linking,
   Platform,
   Pressable,
   SafeAreaView,
@@ -91,9 +92,9 @@ export default function WelcomeScreen({ initialName = "", onNext, onUpdate, onLo
 
             <Text style={styles.legal}>
               By continuing, you agree to our{" "}
-              <Text style={styles.legalLink}>Terms</Text>,{" "}
-              <Text style={styles.legalLink}>Privacy Policy</Text> and{"\n"}
-              <Text style={styles.legalLink}>Community Guidelines</Text>.
+              <Text style={styles.legalLink} onPress={() => Linking.openURL("https://oneatatime.dating/terms.html")}>Terms</Text>,{" "}
+              <Text style={styles.legalLink} onPress={() => Linking.openURL("https://oneatatime.dating/privacy.html")}>Privacy Policy</Text> and{"\n"}
+              <Text style={styles.legalLink} onPress={() => Linking.openURL("https://oneatatime.dating/guidelines.html")}>Community Guidelines</Text>.
             </Text>
           </View>
         </KeyboardAvoidingView>

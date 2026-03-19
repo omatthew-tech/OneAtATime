@@ -400,10 +400,11 @@ export default function ProfileViewScreen({ profile, myProfile, onBack, onMatch,
             keyExtractor={(_, i) => String(i)}
             renderItem={({ item, index }) => (
               <View style={styles.photoFrame}>
-                <Image source={{ uri: item }} style={styles.photo} />
-                {index > maxPhotoIndex && (
-                  <View style={styles.photoBlur} />
-                )}
+                <Image
+                  source={{ uri: item }}
+                  style={styles.photo}
+                  blurRadius={index > maxPhotoIndex ? 25 : 0}
+                />
                 {index === glowPhotoIndex && (
                   <Animated.View
                     style={[

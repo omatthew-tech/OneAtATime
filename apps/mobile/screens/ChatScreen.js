@@ -34,7 +34,10 @@ import {
   reportUser,
   markWeMet,
   sendPushNotification,
+  toggleMessageLike,
+  resetMatchTimer,
 } from "../lib/api";
+import { supabase } from "../lib/supabase";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const PROFILE_PHOTO_WIDTH = SCREEN_WIDTH - spacing.sm * 2;
@@ -407,14 +410,153 @@ function ToggleHeartBurst({ visible }) {
   );
 }
 
-function MessageBubble({ message, isMe }) {
+const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+const TIMER_COLOR = "rgba(255,255,255,0.35)";
+const TIMER_COLOR_LOW = "rgba(255,80,80,0.6)";
+
+function HourglassIcon({ progress, color, size = 16 }) {
+  const topH = 5 * progress;
+  const botH = 5 * (1 - progress);
+  const topY = 5 + (5 - topH);
+  const botY = 13;
+  return (
+    <Svg width={size} height={size} viewBox="0 0 20 20">
+      <SvgPath
+        d="M5 3 H15 V5 L12 10 L15 15 V17 H5 V15 L8 10 L5 5 Z"
+        stroke={color}
+        strokeWidth={1.5}
+        fill="none"
+        strokeLinejoin="round"
+      />
+      {topH > 0.2 && (
+        <SvgPath
+          d={`M7.5 ${topY} L10 ${topY + topH * 0.6} L12.5 ${topY} Z`}
+          fill={color}
+        />
+      )}
+      {botH > 0.2 && (
+        <SvgPath
+          d={`M7.5 ${botY + (5 - botH)} L10 ${botY + 5} L12.5 ${botY + (5 - botH)} Z`}
+          fill={color}
+        />
+      )}
+    </Svg>
+  );
+}
+
+function CountdownTimer({ deadline, onExpire, onPress }) {
+  const [remaining, setRemaining] = useState(() => {
+    const ms = new Date(deadline).getTime() - Date.now();
+    return Math.max(0, ms);
+  });
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+  const prevDeadline = useRef(deadline);
+
+  useEffect(() => {
+    if (deadline !== prevDeadline.current) {
+      prevDeadline.current = deadline;
+      setRemaining(Math.max(0, new Date(deadline).getTime() - Date.now()));
+      Animated.sequence([
+        Animated.timing(pulseAnim, { toValue: 1.3, duration: 200, useNativeDriver: true }),
+        Animated.spring(pulseAnim, { toValue: 1, useNativeDriver: true, speed: 14, bounciness: 10 }),
+      ]).start();
+    }
+  }, [deadline, pulseAnim]);
+
+  useEffect(() => {
+    const tick = setInterval(() => {
+      const ms = new Date(deadline).getTime() - Date.now();
+      if (ms <= 0) {
+        setRemaining(0);
+        clearInterval(tick);
+        onExpire?.();
+      } else {
+        setRemaining(ms);
+      }
+    }, 1000);
+    return () => clearInterval(tick);
+  }, [deadline, onExpire]);
+
+  const totalSec = Math.ceil(remaining / 1000);
+  const hrs = Math.floor(totalSec / 3600);
+  const mins = Math.floor((totalSec % 3600) / 60);
+  const label = `${hrs}:${String(mins).padStart(2, "0")}`;
+  const isLow = remaining < 2 * 60 * 60 * 1000;
+  const color = isLow ? TIMER_COLOR_LOW : TIMER_COLOR;
+  const progress = Math.min(remaining / TWENTY_FOUR_HOURS, 1);
+
+  return (
+    <Pressable onPress={onPress}>
+      <Animated.View style={[timerStyles.row, { transform: [{ scale: pulseAnim }] }]}>
+        <Text style={[timerStyles.label, { color }]}>{label}</Text>
+        <HourglassIcon progress={progress} color={color} size={16} />
+      </Animated.View>
+    </Pressable>
+  );
+}
+
+const timerStyles = StyleSheet.create({
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 1,
+    paddingHorizontal: spacing.xs,
+    paddingVertical: spacing.xs,
+  },
+  label: {
+    fontSize: typography.body,
+    fontWeight: "500",
+  },
+});
+
+function MessageBubble({ message, isMe, onDoubleTap }) {
+  const lastTap = useRef(0);
+  const heartScale = useRef(new Animated.Value(0)).current;
+  const [showHeartPop, setShowHeartPop] = useState(false);
+  const liked = !!message.liked_by;
+
+  const handlePress = () => {
+    const now = Date.now();
+    if (now - lastTap.current < 300) {
+      onDoubleTap?.(message.id);
+      if (!liked) {
+        setShowHeartPop(true);
+        heartScale.setValue(0);
+        Animated.sequence([
+          Animated.spring(heartScale, { toValue: 1.2, useNativeDriver: true, speed: 20, bounciness: 12 }),
+          Animated.timing(heartScale, { toValue: 1, duration: 150, useNativeDriver: true }),
+          Animated.delay(400),
+          Animated.timing(heartScale, { toValue: 0, duration: 200, useNativeDriver: true }),
+        ]).start(() => setShowHeartPop(false));
+      }
+    }
+    lastTap.current = now;
+  };
+
   return (
     <View style={[styles.bubbleRow, isMe && styles.bubbleRowMe]}>
-      <View style={[styles.bubble, isMe ? styles.bubbleMe : styles.bubbleThem]}>
-        <Text style={[styles.bubbleText, isMe && styles.bubbleTextMe]}>
-          {message.body}
-        </Text>
-      </View>
+      <Pressable onPress={handlePress} style={styles.bubbleWrap}>
+        <View style={[styles.bubble, isMe ? styles.bubbleMe : styles.bubbleThem]}>
+          <Text style={[styles.bubbleText, isMe && styles.bubbleTextMe]}>
+            {message.body}
+          </Text>
+        </View>
+        {liked && !showHeartPop && (
+          <View style={[styles.likedHeart, isMe ? styles.likedHeartMe : styles.likedHeartThem]}>
+            <Text style={{ fontSize: 14 }}>❤️</Text>
+          </View>
+        )}
+        {showHeartPop && (
+          <Animated.View
+            style={[
+              styles.heartPop,
+              { transform: [{ scale: heartScale }] },
+            ]}
+          >
+            <Text style={{ fontSize: 28 }}>❤️</Text>
+          </Animated.View>
+        )}
+      </Pressable>
     </View>
   );
 }
@@ -427,6 +569,8 @@ export default function ChatScreen({
   myProfileId,
   revealStage = 3,
   onPass,
+  initialTimerDeadline,
+  initialLastSenderId,
 }) {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState("");
@@ -441,9 +585,11 @@ export default function ChatScreen({
   const [showBlockConfirm, setShowBlockConfirm] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [showToast, setShowToast] = useState("");
+  const [showTimerModal, setShowTimerModal] = useState(false);
+  const [timerDeadline, setTimerDeadline] = useState(initialTimerDeadline);
+  const [lastSenderId, setLastSenderId] = useState(initialLastSenderId);
 
   const listRef = useRef(null);
-  const pollRef = useRef(null);
   const initializedRef = useRef(false);
   const profileScrollRef = useRef(null);
   const sectionY = useRef({});
@@ -539,9 +685,61 @@ export default function ChatScreen({
 
   useEffect(() => {
     loadMessages();
-    pollRef.current = setInterval(loadMessages, 5000);
-    return () => clearInterval(pollRef.current);
-  }, [loadMessages]);
+
+    const channel = supabase
+      .channel(`chat:${matchId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+          filter: `match_id=eq.${matchId}`,
+        },
+        (payload) => {
+          setMessages((prev) => {
+            if (prev.some((m) => m.id === payload.new.id)) return prev;
+            return [...prev, payload.new];
+          });
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "messages",
+          filter: `match_id=eq.${matchId}`,
+        },
+        (payload) => {
+          setMessages((prev) =>
+            prev.map((m) => (m.id === payload.new.id ? { ...m, ...payload.new } : m))
+          );
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "matches",
+          filter: `id=eq.${matchId}`,
+        },
+        (payload) => {
+          if (payload.new.timer_deadline) {
+            setTimerDeadline(payload.new.timer_deadline);
+          }
+          if (payload.new.last_sender_id !== undefined) {
+            setLastSenderId(payload.new.last_sender_id);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [matchId, loadMessages]);
 
   // ─── Reveal logic ─────────────────────────────
 
@@ -618,18 +816,34 @@ export default function ChatScreen({
     }
   }, [queuedRevealIds, stopProfileGlow, getScrollTarget, revealAnim]);
 
+  const sendingRef = useRef(false);
+
   const sendMessage = async (text) => {
-    if (!text.trim() || !matchId) return;
-    const msg = await sendMessageApi(matchId, myProfileId, text.trim());
+    const body = text.trim();
+    if (!body || !matchId || sendingRef.current) return;
+    sendingRef.current = true;
+    setInputText("");
+
+    const msg = await sendMessageApi(matchId, myProfileId, body);
+    sendingRef.current = false;
     if (msg) {
-      setMessages((prev) => [...prev, msg]);
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === msg.id)) return prev;
+        return [...prev, msg];
+      });
       const newCount = myMsgCount + 1;
       setMyMsgCount(newCount);
+
+      if (lastSenderId !== myProfileId) {
+        const newDeadline = await resetMatchTimer(matchId, myProfileId);
+        setTimerDeadline(newDeadline);
+        setLastSenderId(myProfileId);
+      }
 
       sendPushNotification(
         matchedProfile.id,
         matchedProfile.name ? `${matchedProfile.name}` : "New message",
-        text.trim().slice(0, 100),
+        body.slice(0, 100),
         { type: "message", matchId }
       );
 
@@ -660,7 +874,6 @@ export default function ChatScreen({
         }
       }
     }
-    setInputText("");
   };
 
   const handleActionSelect = (action) => {
@@ -695,8 +908,19 @@ export default function ChatScreen({
     setTimeout(() => setShowToast(""), 3000);
   };
 
+  const handleDoubleTap = useCallback(async (messageId) => {
+    const newVal = await toggleMessageLike(messageId, myProfileId);
+    setMessages((prev) =>
+      prev.map((m) => (m.id === messageId ? { ...m, liked_by: newVal } : m))
+    );
+  }, [myProfileId]);
+
   const renderMessage = ({ item }) => (
-    <MessageBubble message={item} isMe={item.sender_id === myProfileId} />
+    <MessageBubble
+      message={item}
+      isMe={item.sender_id === myProfileId}
+      onDoubleTap={handleDoubleTap}
+    />
   );
 
   // ─── Content builder ──────────────────────────
@@ -759,16 +983,28 @@ export default function ChatScreen({
       <StatusBar style="light" />
       <SafeAreaView style={styles.safe}>
         <View style={styles.header}>
-          <Pressable
-            style={styles.dotsButton}
-            onPress={() => setShowActions(true)}
-          >
-            <DotsIcon />
-          </Pressable>
+          <View style={styles.headerSide}>
+            <Pressable
+              style={styles.dotsButton}
+              onPress={() => setShowActions(true)}
+            >
+              <DotsIcon />
+            </Pressable>
+          </View>
           <Text style={styles.headerName}>{matchedProfile.name}</Text>
-          <Pressable onPress={() => setShowPassConfirm(true)}>
-            <Text style={styles.passText}>pass</Text>
-          </Pressable>
+          <View style={[styles.headerSide, { alignItems: "flex-end" }]}>
+            {timerDeadline ? (
+              <CountdownTimer
+                deadline={timerDeadline}
+                onExpire={() => onPass?.()}
+                onPress={() => setShowTimerModal(true)}
+              />
+            ) : (
+              <Pressable onPress={() => setShowPassConfirm(true)}>
+                <Text style={styles.passText}>pass</Text>
+              </Pressable>
+            )}
+          </View>
         </View>
 
         <View style={styles.toggleBar}>
@@ -1011,6 +1247,49 @@ export default function ChatScreen({
       </SafeAreaView>
 
       <Modal
+        visible={showTimerModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowTimerModal(false)}
+      >
+        <Pressable
+          style={styles.passOverlay}
+          onPress={() => setShowTimerModal(false)}
+        >
+          <View style={styles.passModal}>
+            <View style={styles.timerModalHeader}>
+              {timerDeadline && (
+                <CountdownTimer
+                  deadline={timerDeadline}
+                  onExpire={() => { setShowTimerModal(false); onPass?.(); }}
+                />
+              )}
+            </View>
+            <Text style={styles.passModalBody}>
+              You'll automatically pass if your match doesn't respond within 24 hours. You can also choose to pass now.
+            </Text>
+            <View style={styles.passModalButtons}>
+              <Pressable
+                style={styles.passModalCancel}
+                onPress={() => setShowTimerModal(false)}
+              >
+                <Text style={styles.passModalCancelText}>Cancel</Text>
+              </Pressable>
+              <Pressable
+                style={styles.passModalConfirm}
+                onPress={() => {
+                  setShowTimerModal(false);
+                  onPass?.();
+                }}
+              >
+                <Text style={styles.passModalConfirmText}>Pass</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Pressable>
+      </Modal>
+
+      <Modal
         visible={showPassConfirm}
         transparent
         animationType="fade"
@@ -1161,10 +1440,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xs,
     paddingVertical: spacing.xs,
   },
+  headerSide: {
+    width: 80,
+  },
   headerName: {
+    flex: 1,
     fontSize: typography.subtitle,
     fontWeight: "700",
     color: colors.textPrimary,
+    textAlign: "center",
   },
   dotsButton: {
     width: 44,
@@ -1174,6 +1458,7 @@ const styles = StyleSheet.create({
   },
 
   toggleBar: {
+    alignItems: "center",
     paddingHorizontal: spacing.sm,
     paddingBottom: spacing.xs,
     borderBottomWidth: 1,
@@ -1222,32 +1507,49 @@ const styles = StyleSheet.create({
   },
   bubbleRow: {
     flexDirection: "row",
-    marginBottom: spacing.xs,
+    marginBottom: 6,
   },
   bubbleRowMe: {
     justifyContent: "flex-end",
   },
+  bubbleWrap: {
+    maxWidth: "75%",
+  },
   bubble: {
-    maxWidth: "78%",
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.sm,
-    borderRadius: radius.md,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 20,
   },
   bubbleThem: {
     backgroundColor: colors.oceanDeep,
-    borderBottomLeftRadius: spacing.xxs,
+    borderBottomLeftRadius: 4,
   },
   bubbleMe: {
     backgroundColor: colors.tealGlow,
-    borderBottomRightRadius: spacing.xxs,
+    borderBottomRightRadius: 4,
   },
   bubbleText: {
-    fontSize: typography.body,
-    lineHeight: lineHeights.body,
+    fontSize: 15,
+    lineHeight: 20,
     color: colors.textPrimary,
   },
   bubbleTextMe: {
     color: colors.oceanAbyss,
+  },
+  likedHeart: {
+    position: "absolute",
+    bottom: -8,
+  },
+  likedHeartMe: {
+    right: 4,
+  },
+  likedHeartThem: {
+    left: 4,
+  },
+  heartPop: {
+    position: "absolute",
+    alignSelf: "center",
+    top: "30%",
   },
 
   doubleTapHint: {
@@ -1326,6 +1628,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.oceanDeep,
     borderRadius: radius.md,
     padding: spacing.md,
+  },
+  timerModalHeader: {
+    marginBottom: spacing.xs,
   },
   passModalTitle: {
     fontSize: typography.subtitle,

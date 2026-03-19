@@ -24,7 +24,7 @@ import BottomTabBar, {
   MessageHeartIcon,
 } from "./components/BottomTabBar";
 import { createProfile } from "./lib/createProfile";
-import { getStoredProfileId, clearProfileId } from "./lib/deviceId";
+import { getStoredProfileId, clearProfileId, storeProfileId } from "./lib/deviceId";
 import {
   fetchProfile,
   fetchProfileByEmail,
@@ -35,8 +35,9 @@ import {
   savePreferences,
   updateProfile as updateProfileApi,
   sendPushNotification,
+  normalizeCountry,
 } from "./lib/api";
-import { storeProfileId } from "./lib/deviceId";
+import { supabase } from "./lib/supabase";
 import {
   registerForPushNotifications,
   addNotificationResponseListener,
@@ -53,7 +54,6 @@ const TABS_DEFAULT = [
 
 const TABS_MATCHED = [
   { key: "message", label: "Message", Icon: MessageHeartIcon },
-  { key: "matches", label: "Insights", Icon: InsightsIcon },
   { key: "me", label: "Me", Icon: MeIcon },
 ];
 
@@ -70,6 +70,8 @@ function MainTabs({ profile, onUpdateProfile, onLogout }) {
   });
   const [matchedProfile, setMatchedProfile] = useState(null);
   const [matchId, setMatchId] = useState(null);
+  const [timerDeadline, setTimerDeadline] = useState(null);
+  const [lastSenderId, setLastSenderId] = useState(null);
   const [showCelebration, setShowCelebration] = useState(false);
   const [revealProgress, setRevealProgress] = useState({});
   const [showCompletion, setShowCompletion] = useState(false);
@@ -81,6 +83,8 @@ function MainTabs({ profile, onUpdateProfile, onLogout }) {
       if (!cancelled && active) {
         setMatchedProfile(active.profile);
         setMatchId(active.matchId);
+        setTimerDeadline(active.timerDeadline);
+        setLastSenderId(active.lastSenderId);
         setActiveTab("message");
       }
     })();
@@ -95,6 +99,8 @@ function MainTabs({ profile, onUpdateProfile, onLogout }) {
         setViewingProfile(null);
         setMatchedProfile(matched);
         setMatchId(match.id);
+        setTimerDeadline(match.timer_deadline);
+        setLastSenderId(null);
         setShowCelebration(true);
         sendPushNotification(
           matched.id,
@@ -132,6 +138,8 @@ function MainTabs({ profile, onUpdateProfile, onLogout }) {
     if (matchId) await endMatch(matchId);
     setMatchedProfile(null);
     setMatchId(null);
+    setTimerDeadline(null);
+    setLastSenderId(null);
     setActiveTab("discover");
   }, [matchId]);
 
@@ -140,8 +148,10 @@ function MainTabs({ profile, onUpdateProfile, onLogout }) {
       setPreferences(prefs);
       await savePreferences(profile.id, prefs);
       if (prefs.location && prefs.location !== profile.location_text) {
-        await updateProfileApi(profile.id, { location_text: prefs.location });
-        onUpdateProfile({ location_text: prefs.location });
+        const updates = { location_text: prefs.location };
+        if (prefs.country) updates.country = normalizeCountry(prefs.country);
+        await updateProfileApi(profile.id, updates);
+        onUpdateProfile(updates);
       }
     },
     [profile.id, profile.location_text, onUpdateProfile]
@@ -151,14 +161,20 @@ function MainTabs({ profile, onUpdateProfile, onLogout }) {
     return (
       <ProfileCompletionScreen
         profile={profile}
-        onComplete={async (fields) => {
-          await updateProfileApi(profile.id, fields);
-          onUpdateProfile(fields);
+        onComplete={async (data) => {
+          const { prompts: savedPrompts, ...profileFields } = data;
+          await updateProfileApi(profile.id, profileFields);
+          const updates = { ...profileFields };
+          if (savedPrompts) updates.prompts = savedPrompts;
+          onUpdateProfile(updates);
           setShowCompletion(false);
         }}
         onCancel={() => setShowCompletion(false)}
         onSavePartial={async (partial) => {
-          await updateProfileApi(profile.id, partial);
+          const { prompts: savedPrompts, ...profileFields } = partial;
+          if (Object.keys(profileFields).length > 0) {
+            await updateProfileApi(profile.id, profileFields);
+          }
           onUpdateProfile(partial);
         }}
       />
@@ -214,7 +230,7 @@ function MainTabs({ profile, onUpdateProfile, onLogout }) {
       {activeTab === "discover" && (
         <HomeScreen
           profileId={profile.id}
-          myCountry={profile.country}
+          myCountry={normalizeCountry(profile.country)}
           preferences={preferences}
           onViewProfile={setViewingProfile}
           onOpenPrefs={() => setShowPrefs(true)}
@@ -235,6 +251,8 @@ function MainTabs({ profile, onUpdateProfile, onLogout }) {
           myProfileId={profile.id}
           revealStage={revealProgress[matchedProfile.id] ?? 3}
           onPass={handlePassFromChat}
+          initialTimerDeadline={timerDeadline}
+          initialLastSenderId={lastSenderId}
         />
       )}
       <BottomTabBar activeTab={activeTab} onTabPress={setActiveTab} tabs={tabs} />
@@ -265,6 +283,12 @@ function AppContent() {
     try {
       clearError();
       setLoading(true);
+
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        await supabase.auth.signInAnonymously();
+      }
+
       const storedId = await getStoredProfileId();
       if (storedId) {
         const existing = await fetchProfile(storedId);
@@ -314,7 +338,7 @@ function AppContent() {
           is_onboarded: true,
           location_text: merged.location_text || "",
           location_hidden: !!merged.location_hidden,
-          country: merged.country || "",
+          country: normalizeCountry(merged.country || ""),
         });
       }
 
@@ -332,6 +356,8 @@ function AppContent() {
   }, []);
 
   const handleLogout = useCallback(async () => {
+    await supabase.auth.signOut();
+    await supabase.auth.signInAnonymously();
     await clearProfileId();
     setProfile({ name: "", introversion: "Introvert", gender: null, age: "" });
     setScreenIndex(0);
@@ -341,6 +367,10 @@ function AppContent() {
   const handleLogin = useCallback(async (email) => {
     const existing = await fetchProfileByEmail(email);
     if (existing) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await updateProfileApi(existing.id, { user_id: user.id });
+      }
       await storeProfileId(existing.id);
       setProfile(existing);
       setScreenIndex(SCREENS.indexOf("main"));

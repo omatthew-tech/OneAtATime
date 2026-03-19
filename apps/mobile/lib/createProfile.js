@@ -2,6 +2,8 @@ import { supabase } from "./supabase";
 import { storeProfileId } from "./deviceId";
 
 export async function createProfile({ name, introversion, gender, age }) {
+  const { data: { user } } = await supabase.auth.getUser();
+
   const { data, error } = await supabase
     .from("profiles")
     .insert({
@@ -10,6 +12,7 @@ export async function createProfile({ name, introversion, gender, age }) {
       gender,
       age,
       is_onboarded: false,
+      user_id: user?.id || null,
     })
     .select()
     .single();
@@ -19,10 +22,8 @@ export async function createProfile({ name, introversion, gender, age }) {
     return null;
   }
 
-  // Use the Supabase-generated UUID as the device identifier
   await storeProfileId(data.id);
 
-  // Write it back so we can look up by device_id on future launches
   await supabase
     .from("profiles")
     .update({ device_id: data.id })

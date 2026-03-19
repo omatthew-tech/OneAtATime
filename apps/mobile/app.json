@@ -13,7 +13,8 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.oneatime.app",
+      "bundleIdentifier": "dating.oneatatime.app",
+      "buildNumber": "1",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSPhotoLibraryUsageDescription": "OneAtATime needs access to your photos so you can add pictures to your dating profile.",
@@ -21,6 +22,8 @@
       }
     },
     "android": {
+      "package": "dating.oneatatime.app",
+      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#0a1628",
         "foregroundImage": "./assets/android-icon-foreground.png",
