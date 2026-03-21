@@ -62,3 +62,21 @@ export function addNotificationResponseListener(callback) {
     callback(data);
   });
 }
+
+export async function getLastNotificationResponseData() {
+  if (!Notifications?.getLastNotificationResponseAsync) return null;
+
+  try {
+    const response = await Notifications.getLastNotificationResponseAsync();
+    const data = response?.notification?.request?.content?.data || null;
+
+    if (data && Notifications.clearLastNotificationResponseAsync) {
+      await Notifications.clearLastNotificationResponseAsync();
+    }
+
+    return data;
+  } catch (e) {
+    console.warn("Could not read last notification response:", e.message);
+    return null;
+  }
+}

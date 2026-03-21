@@ -569,13 +569,14 @@ export default function ChatScreen({
   myProfileId,
   revealStage = 3,
   onPass,
+  initialTab = "chat",
   initialTimerDeadline,
   initialLastSenderId,
 }) {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState("");
   const [showActions, setShowActions] = useState(false);
-  const [tab, setTab] = useState("chat");
+  const [tab, setTab] = useState(initialTab);
   const [myMsgCount, setMyMsgCount] = useState(0);
   const [pendingRevealIds, setPendingRevealIds] = useState([]);
   const [queuedRevealIds, setQueuedRevealIds] = useState([]);
@@ -597,6 +598,10 @@ export default function ChatScreen({
   const revealAnim = useRef(new Animated.Value(1)).current;
   const glowAnim = useRef(new Animated.Value(0)).current;
   const glowLoop = useRef(null);
+
+  useEffect(() => {
+    setTab(initialTab);
+  }, [initialTab]);
 
   const hasSentMessage = messages.some((m) => m.sender_id === myProfileId);
 
@@ -844,7 +849,13 @@ export default function ChatScreen({
         matchedProfile.id,
         matchedProfile.name ? `${matchedProfile.name}` : "New message",
         body.slice(0, 100),
-        { type: "message", matchId }
+        {
+          type: "message",
+          matchId,
+          targetTab: "message",
+          targetScreen: "chat",
+          chatTab: "chat",
+        }
       );
 
       const thresholdIdx = REVEAL_THRESHOLDS.indexOf(newCount);
@@ -853,7 +864,13 @@ export default function ChatScreen({
           matchedProfile.id,
           "New reveal!",
           `${matchedProfile.name || "Someone"} just uncovered something about you`,
-          { type: "chat-reveal", matchId }
+          {
+            type: "chat-reveal",
+            matchId,
+            targetTab: "message",
+            targetScreen: "chat",
+            chatTab: "profile",
+          }
         );
 
         const isLast = thresholdIdx === REVEAL_THRESHOLDS.length - 1;

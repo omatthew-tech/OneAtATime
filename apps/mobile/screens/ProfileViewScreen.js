@@ -266,7 +266,10 @@ const PROFILE_FIELDS = [
 
 function isProfileComplete(p) {
   if (!p) return false;
-  return PROFILE_FIELDS.every((f) => p[f] && String(p[f]).trim().length > 0);
+  const hasPrompt = (p.prompts || []).some(
+    (prompt) => prompt?.prompt_text && prompt?.answer && String(prompt.answer).trim().length > 0
+  );
+  return PROFILE_FIELDS.every((f) => p[f] && String(p[f]).trim().length > 0) && hasPrompt;
 }
 
 export default function ProfileViewScreen({ profile, myProfile, onBack, onMatch, onPass, onCompleteProfile, initialRevealStage = 0, totalRevealable = 2, onRevealChange }) {

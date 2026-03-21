@@ -708,17 +708,17 @@ export default function MeScreen({ profile, onUpdateProfile, onLogout }) {
           <View style={styles.section}>
             <SectionHeader title="Legal" />
             <View style={styles.detailsCard}>
-              <Pressable style={styles.profileRow} onPress={() => Linking.openURL("https://oneatatime.pages.dev/terms.html")}>
+              <Pressable style={styles.profileRow} onPress={() => Linking.openURL("https://oneatatime.dating/terms")}>
                 <Text style={styles.actionLabel}>Terms of Service</Text>
                 <ChevronRight />
               </Pressable>
               <View style={styles.divider} />
-              <Pressable style={styles.profileRow} onPress={() => Linking.openURL("https://oneatatime.pages.dev/privacy.html")}>
+              <Pressable style={styles.profileRow} onPress={() => Linking.openURL("https://oneatatime.dating/privacy")}>
                 <Text style={styles.actionLabel}>Privacy Policy</Text>
                 <ChevronRight />
               </Pressable>
               <View style={styles.divider} />
-              <Pressable style={styles.profileRow} onPress={() => Linking.openURL("https://oneatatime.pages.dev/guidelines.html")}>
+              <Pressable style={styles.profileRow} onPress={() => Linking.openURL("https://oneatatime.dating/guidelines")}>
                 <Text style={styles.actionLabel}>Community Guidelines</Text>
                 <ChevronRight />
               </Pressable>

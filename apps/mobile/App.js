@@ -41,6 +41,7 @@ import { supabase } from "./lib/supabase";
 import {
   registerForPushNotifications,
   addNotificationResponseListener,
+  getLastNotificationResponseData,
 } from "./lib/notifications";
 import { colors } from "./theme";
 
@@ -57,7 +58,13 @@ const TABS_MATCHED = [
   { key: "me", label: "Me", Icon: MeIcon },
 ];
 
-function MainTabs({ profile, onUpdateProfile, onLogout }) {
+function MainTabs({
+  profile,
+  onUpdateProfile,
+  onLogout,
+  pendingNotificationRoute,
+  onNotificationRouteHandled,
+}) {
   const [activeTab, setActiveTab] = useState("discover");
   const [viewingProfile, setViewingProfile] = useState(null);
   const [showPrefs, setShowPrefs] = useState(false);
@@ -75,6 +82,7 @@ function MainTabs({ profile, onUpdateProfile, onLogout }) {
   const [showCelebration, setShowCelebration] = useState(false);
   const [revealProgress, setRevealProgress] = useState({});
   const [showCompletion, setShowCompletion] = useState(false);
+  const [chatInitialTab, setChatInitialTab] = useState("chat");
 
   useEffect(() => {
     let cancelled = false;
@@ -91,6 +99,52 @@ function MainTabs({ profile, onUpdateProfile, onLogout }) {
     return () => { cancelled = true; };
   }, [profile.id]);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!pendingNotificationRoute) return undefined;
+
+    (async () => {
+      if (pendingNotificationRoute.targetTab === "message") {
+        setViewingProfile(null);
+        setShowPrefs(false);
+        const active = await fetchActiveMatch(profile.id);
+        if (cancelled) return;
+
+        if (active) {
+          setMatchedProfile(active.profile);
+          setMatchId(active.matchId);
+          setTimerDeadline(active.timerDeadline);
+          setLastSenderId(active.lastSenderId);
+          setChatInitialTab(pendingNotificationRoute.chatTab || "chat");
+          setActiveTab("message");
+        }
+
+        onNotificationRouteHandled?.();
+        return;
+      }
+
+      if (
+        pendingNotificationRoute.targetTab === "discover" &&
+        pendingNotificationRoute.targetScreen === "profile" &&
+        pendingNotificationRoute.profileId
+      ) {
+        setShowPrefs(false);
+        const targetProfile = await fetchProfile(pendingNotificationRoute.profileId);
+        if (!cancelled && targetProfile) {
+          setViewingProfile(targetProfile);
+          setActiveTab("discover");
+        }
+      }
+
+      onNotificationRouteHandled?.();
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [pendingNotificationRoute, profile.id, onNotificationRouteHandled]);
+
   const handleMatch = useCallback(
     async (matched) => {
       await recordSwipe(profile.id, matched.id, "like");
@@ -106,14 +160,26 @@ function MainTabs({ profile, onUpdateProfile, onLogout }) {
           matched.id,
           "It's a match!",
           `You and ${profile.name} matched`,
-          { type: "match", matchId: match.id }
+          {
+            type: "match",
+            matchId: match.id,
+            targetTab: "message",
+            targetScreen: "chat",
+            chatTab: "chat",
+          }
         );
       } else {
         sendPushNotification(
           matched.id,
           "Someone's interested",
           `${profile.name} revealed your profile`,
-          { type: "reveal", revealerId: profile.id }
+          {
+            type: "reveal",
+            revealerId: profile.id,
+            profileId: profile.id,
+            targetTab: "discover",
+            targetScreen: "profile",
+          }
         );
         setViewingProfile(null);
       }
@@ -251,6 +317,7 @@ function MainTabs({ profile, onUpdateProfile, onLogout }) {
           myProfileId={profile.id}
           revealStage={revealProgress[matchedProfile.id] ?? 3}
           onPass={handlePassFromChat}
+          initialTab={chatInitialTab}
           initialTimerDeadline={timerDeadline}
           initialLastSenderId={lastSenderId}
         />
@@ -272,12 +339,28 @@ function AppContent() {
   const [loading, setLoading] = useState(true);
   const [screenIndex, setScreenIndex] = useState(0);
   const [showLogin, setShowLogin] = useState(false);
+  const [pendingNotificationRoute, setPendingNotificationRoute] = useState(null);
   const [profile, setProfile] = useState({
     name: "",
     introversion: "Introvert",
     gender: null,
     age: "",
   });
+
+  const handleNotificationRoute = useCallback((data) => {
+    if (!data) return;
+
+    setShowLogin(false);
+    setScreenIndex(SCREENS.indexOf("main"));
+    setPendingNotificationRoute({
+      type: data.type,
+      matchId: data.matchId || null,
+      profileId: data.profileId || data.revealerId || null,
+      targetTab: data.targetTab || (data.type === "reveal" ? "discover" : "message"),
+      targetScreen: data.targetScreen || (data.type === "reveal" ? "profile" : "chat"),
+      chatTab: data.chatTab || "chat",
+    });
+  }, []);
 
   const loadApp = useCallback(async () => {
     try {
@@ -308,13 +391,23 @@ function AppContent() {
   useEffect(() => {
     loadApp();
 
-    const sub = addNotificationResponseListener((data) => {
-      if (data.type === "message" || data.type === "chat-reveal" || data.type === "match") {
-        setScreenIndex(SCREENS.indexOf("main"));
+    let mounted = true;
+
+    (async () => {
+      const initialNotification = await getLastNotificationResponseData();
+      if (mounted && initialNotification) {
+        handleNotificationRoute(initialNotification);
       }
+    })();
+
+    const sub = addNotificationResponseListener((data) => {
+      handleNotificationRoute(data);
     });
-    return () => sub.remove();
-  }, [loadApp]);
+    return () => {
+      mounted = false;
+      sub.remove();
+    };
+  }, [handleNotificationRoute, loadApp]);
 
   const goNext = useCallback(
     async (data) => {
@@ -373,6 +466,7 @@ function AppContent() {
       }
       await storeProfileId(existing.id);
       setProfile(existing);
+      registerForPushNotifications(existing.id);
       setScreenIndex(SCREENS.indexOf("main"));
       setShowLogin(false);
     }
@@ -462,6 +556,8 @@ function AppContent() {
           profile={profile}
           onUpdateProfile={updateProfile}
           onLogout={handleLogout}
+          pendingNotificationRoute={pendingNotificationRoute}
+          onNotificationRouteHandled={() => setPendingNotificationRoute(null)}
         />
       );
     default:

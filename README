@@ -1,5 +1,26 @@
+Appstore Beta
+eas build --platform ios --profile production
+eas submit --platform ios --latest
+
+OR
+
+eas build --platform ios --profile production --auto-submit
+
+
+
+
+
+Developement (not for appstore)
+eas build --profile development --platform ios
+npx expo start --dev-client
+
+
+
+
 npx expo start --dev-client
 
 eas build --profile development --platform ios
 
-eas submit --platform ios
+eas submit --platform ios --latest
+
+Update App.Json Version 1.0.0
