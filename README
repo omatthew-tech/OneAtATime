@@ -24,3 +24,5 @@ eas build --profile development --platform ios
 eas submit --platform ios --latest
 
 Update App.Json Version 1.0.0
+
+npx expo install --check

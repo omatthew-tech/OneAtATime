@@ -932,6 +932,339 @@
     }
 
     /* ============================================
+       NAVBAR
+       ============================================ */
+    .site-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background: rgba(10, 22, 40, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 0 var(--fib-5);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+      opacity: 0;
+      transform: translateY(-100%);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .site-nav.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: var(--fib-1);
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: var(--font-size-base);
+    }
+
+    .nav-brand svg {
+      width: 28px;
+      height: auto;
+      stroke: var(--teal-glow);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: var(--fib-4);
+      align-items: center;
+    }
+
+    .nav-links a {
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.2s;
+      letter-spacing: 0.3px;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: var(--teal-glow);
+    }
+
+    .nav-youtube {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s, opacity 0.2s;
+      opacity: 0.7;
+    }
+
+    .nav-youtube:hover {
+      opacity: 1;
+      transform: scale(1.12);
+    }
+
+    .nav-youtube svg {
+      width: 26px;
+      height: 26px;
+      fill: #ff0000;
+    }
+
+    .nav-cta {
+      display: flex;
+      align-items: center;
+      gap: var(--fib-2);
+    }
+
+    .nav-cta-text {
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .nav-cta-button {
+      display: inline-block;
+      padding: 8px 20px;
+      font-size: var(--font-size-sm);
+      font-weight: 700;
+      color: var(--ocean-abyss);
+      background: var(--teal-glow);
+      border-radius: 100px;
+      text-decoration: none;
+      letter-spacing: 0.3px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 16px rgba(0, 212, 170, 0.35);
+      animation: ctaPulse 2.5s ease-in-out infinite;
+    }
+
+    .nav-cta-button:hover {
+      transform: scale(1.06);
+      box-shadow: 0 0 24px rgba(0, 212, 170, 0.55);
+    }
+
+    @keyframes ctaPulse {
+      0%, 100% { box-shadow: 0 0 16px rgba(0, 212, 170, 0.35); }
+      50% { box-shadow: 0 0 28px rgba(0, 212, 170, 0.6); }
+    }
+
+    .nav-toggle {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: var(--fib-1);
+    }
+
+    .nav-toggle span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--text-secondary);
+      margin: 5px 0;
+      transition: 0.3s;
+    }
+
+    /* ============================================
+       PAGE SECTIONS
+       ============================================ */
+    .page-section {
+      min-height: 80vh;
+      padding: var(--fib-7) var(--fib-6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg,
+        var(--ocean-deep) 0%,
+        var(--ocean-abyss) 100%);
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .page-section:nth-child(even) {
+      background: linear-gradient(180deg,
+        var(--ocean-abyss) 0%,
+        var(--ocean-deep) 100%);
+    }
+
+    .page-section-inner {
+      max-width: 720px;
+      width: 100%;
+    }
+
+    .page-section-title {
+      font-size: var(--font-size-xl);
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: var(--fib-4);
+      text-align: center;
+    }
+
+    .page-section-title span {
+      color: var(--teal-glow);
+    }
+
+    .page-section-body {
+      font-size: var(--font-size-base);
+      line-height: 1.8;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+
+    .page-section-body p + p {
+      margin-top: var(--fib-3);
+    }
+
+    /* Team cards */
+    .team-grid {
+      display: flex;
+      flex-direction: column;
+      gap: var(--fib-5);
+    }
+
+    .team-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--fib-3);
+      padding: var(--fib-4);
+      text-align: center;
+    }
+
+    .team-card-name {
+      font-size: var(--font-size-lg);
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: var(--fib-1);
+    }
+
+    .team-card-role {
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      color: var(--teal-glow);
+      margin-bottom: var(--fib-2);
+      letter-spacing: 0.5px;
+    }
+
+    .team-card-bio {
+      font-size: var(--font-size-sm);
+      line-height: 1.7;
+      color: var(--text-secondary);
+    }
+
+    /* Pearls pricing */
+    .pearls-tiers {
+      display: flex;
+      gap: var(--fib-3);
+      justify-content: center;
+      margin: var(--fib-4) 0;
+      flex-wrap: wrap;
+    }
+
+    .pearl-tier {
+      background: rgba(0, 212, 170, 0.08);
+      border: 1px solid rgba(0, 212, 170, 0.2);
+      border-radius: var(--fib-2);
+      padding: var(--fib-3) var(--fib-4);
+      text-align: center;
+      min-width: 140px;
+    }
+
+    .pearl-tier-count {
+      font-size: var(--font-size-lg);
+      font-weight: 700;
+      color: var(--teal-glow);
+    }
+
+    .pearl-tier-price {
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+      margin-top: var(--fib-1);
+    }
+
+    /* Partner card */
+    .partner-grid {
+      display: flex;
+      justify-content: center;
+      gap: var(--fib-4);
+      flex-wrap: wrap;
+    }
+
+    .partner-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--fib-3);
+      padding: var(--fib-4) var(--fib-5);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--fib-2);
+      min-width: 200px;
+    }
+
+    .partner-card img {
+      width: 120px;
+      height: auto;
+      border-radius: var(--fib-2);
+    }
+
+    .partner-card-name {
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    @media (max-width: 768px) {
+      .site-nav {
+        padding: 0 var(--fib-3);
+      }
+
+      .nav-cta-text {
+        display: none;
+      }
+
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        right: 0;
+        background: rgba(10, 22, 40, 0.96);
+        backdrop-filter: blur(12px);
+        flex-direction: column;
+        padding: var(--fib-3);
+        gap: var(--fib-3);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .nav-links.open {
+        display: flex;
+      }
+
+      .nav-toggle {
+        display: block;
+      }
+
+      .page-section {
+        padding: var(--fib-6) var(--fib-3);
+        min-height: auto;
+      }
+
+      .page-section-title {
+        font-size: var(--font-size-lg);
+      }
+
+      .pearls-tiers {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+
+    /* ============================================
        FOOTER
        ============================================ */
     footer {
@@ -2196,6 +2529,34 @@
 
 </head>
 <body>
+  <!-- Navbar -->
+  <nav class="site-nav" id="siteNav">
+    <a href="#" class="nav-brand" onclick="scrollToTop(event)">
+      <svg viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 10 25 Q 30 5, 70 25 Q 30 45, 10 25 M 75 25 L 95 15 M 75 25 L 95 35" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="25" cy="22" r="4" stroke-width="2"/>
+      </svg>
+      OneAtATime
+    </a>
+    <div class="nav-cta">
+      <span class="nav-cta-text">Join the public beta now</span>
+      <a href="https://testflight.apple.com/join/evC8QckE" target="_blank" rel="noopener" class="nav-cta-button">Join Beta</a>
+    </div>
+    <button class="nav-toggle" id="navToggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="nav-links" id="navLinks">
+      <a href="#about">About Us</a>
+      <a href="#team">Team</a>
+      <a href="#vision">Vision</a>
+      <a href="#pearls">Pearls</a>
+      <a href="#partners">Partners</a>
+      <a href="https://youtu.be/P3zOfo5pmRE?si=uKupT0lyi9xqv6Xy" target="_blank" rel="noopener" class="nav-youtube" aria-label="YouTube">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+      </a>
+    </div>
+  </nav>
+
   <!-- Skip Button -->
   <button class="skip-intro" id="skipBtn">Skip Intro →</button>
 
@@ -2499,6 +2860,93 @@
       </div>
     </section>
 
+    <!-- About Us / Mission -->
+    <section class="page-section" id="about">
+      <div class="page-section-inner">
+        <h2 class="page-section-title">About Us / <span>Mission</span></h2>
+        <div class="page-section-body">
+          <p>OneAtATime Dating was created for people who want a calmer, more intentional dating experience. We believe meaningful connections are harder to build when dating feels rushed, overwhelming, or superficial. Our mission is to make dating feel more human by helping people focus on one match at a time, connect more deeply, and build something real at a pace that feels natural.</p>
+          <p>Like many dating apps, it was started by myself and two sisters. One of our favorite things to talk about is our dating app experience. We have many funny (and sometimes frustrating) stories about miscommunications, wrong expectations and lots of mismatches. We also like to complain about how much energy it takes to navigate apps like Tinder and how superficial people can be.</p>
+          <p>This inspired us to design our own dating app, OneAtATime Dating. We hope to see you there as we try to make a better experience for introverts and people who want a better dating app experience.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Team -->
+    <section class="page-section" id="team">
+      <div class="page-section-inner">
+        <h2 class="page-section-title"><span>Team</span></h2>
+        <div class="team-grid">
+          <div class="team-card">
+            <div class="team-card-name">Matthew Ozoroski</div>
+            <div class="team-card-role">Founder &amp; CEO</div>
+            <div class="team-card-bio">Matthew founded OneAtATime Dating to create a calmer, more intentional dating experience for people who are tired of how overwhelming modern dating apps can feel. He leads the company's vision, product direction, and overall strategy.</div>
+          </div>
+          <div class="team-card">
+            <div class="team-card-name">Christina Ozoroski</div>
+            <div class="team-card-role">Co-Founder &amp; Chief Marketing Officer</div>
+            <div class="team-card-bio">Christina helps shape the voice of OneAtATime Dating and leads marketing, branding, and community outreach. With a background in psychology and a strong understanding of people, she brings empathy and energy to how the company connects with its audience.</div>
+          </div>
+          <div class="team-card">
+            <div class="team-card-name">Tori Williams</div>
+            <div class="team-card-role">Co-Founder &amp; Chief Operating Officer</div>
+            <div class="team-card-bio">Tori leads operations and helps turn ideas into clear plans and execution. With experience as a CEO and business consultant, she brings structure, accountability, and a strong operational foundation to the team.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Vision -->
+    <section class="page-section" id="vision">
+      <div class="page-section-inner">
+        <h2 class="page-section-title"><span>Vision</span></h2>
+        <div class="page-section-body">
+          <p>We envision a world where dating apps encourage depth over volume. Where taking it slow isn't a disadvantage, and where every interaction feels worth your time. OneAtATime is built on the belief that the best connections happen when you're not distracted by dozens of options pulling you in different directions.</p>
+          <p>Our long-term vision is to become the go-to platform for people who value intentionality in how they meet someone new. We want to prove that a dating app can be designed around respect for your time, your energy, and your boundaries.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pearls -->
+    <section class="page-section" id="pearls">
+      <div class="page-section-inner">
+        <h2 class="page-section-title"><span>Pearls</span></h2>
+        <div class="page-section-body">
+          <p>Pearls are OneAtATime Dating's in-app credits. When you sign up with your email, you'll get 3 free Pearls to start. You can use Pearls for premium features like more reveals, which leads to more matches. If you want more, you'll be able to purchase additional Pearls anytime.</p>
+        </div>
+        <div class="pearls-tiers">
+          <div class="pearl-tier">
+            <div class="pearl-tier-count">50 Pearls</div>
+            <div class="pearl-tier-price">$4.99</div>
+          </div>
+          <div class="pearl-tier">
+            <div class="pearl-tier-count">100 Pearls</div>
+            <div class="pearl-tier-price">$8.99</div>
+          </div>
+          <div class="pearl-tier">
+            <div class="pearl-tier-count">200 Pearls</div>
+            <div class="pearl-tier-price">$14.99</div>
+          </div>
+        </div>
+        <div class="page-section-body">
+          <p>We built Pearls to support the app in a way that still feels simple, flexible, and true to our mission: making dating feel less overwhelming and more meaningful.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Partners -->
+    <section class="page-section" id="partners">
+      <div class="page-section-inner">
+        <h2 class="page-section-title"><span>Partners</span></h2>
+        <div class="partner-grid">
+          <div class="partner-card">
+            <img src="https://www.cursor.com/brand/icon.svg" alt="Cursor" onerror="this.onerror=null;this.src='https://asset.brandfetch.io/idMTVhJdt1/idYv1jQ_Ti.svg'">
+            <div class="partner-card-name">Cursor</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Footer -->
     <footer id="footer">
       <div class="footer-logo">
@@ -2515,6 +2963,7 @@
         <span class="footer-sep">·</span>
         <a href="/guidelines.html">Guidelines</a>
       </div>
+      <p class="footer-text">support@oneatatime.dating</p>
       <p class="footer-text">© 2026 OneAtATime. Finding your person, not your options.</p>
     </footer>
   </main>
@@ -3212,6 +3661,47 @@
     window.addEventListener('scroll', checkLearnMoreVisibility);
     // Also check on load in case user refreshes while scrolled down
     setTimeout(checkLearnMoreVisibility, 1000);
+
+    // ============================================
+    // NAVBAR
+    // ============================================
+    const siteNav = document.getElementById('siteNav');
+    const navToggle = document.getElementById('navToggle');
+    const navLinks = document.getElementById('navLinks');
+
+    function showNavbar() {
+      siteNav.classList.add('visible');
+    }
+
+    navToggle.addEventListener('click', () => {
+      navLinks.classList.toggle('open');
+    });
+
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        navLinks.classList.remove('open');
+      });
+    });
+
+    function scrollToTop(e) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      navLinks.classList.remove('open');
+    }
+
+    let navShown = false;
+    window.addEventListener('scroll', () => {
+      if (!navShown && window.scrollY > 200) {
+        navShown = true;
+        showNavbar();
+      }
+    });
+
+    // Also show navbar immediately if page loads scrolled
+    if (window.scrollY > 200) {
+      navShown = true;
+      showNavbar();
+    }
   </script>
 </body>
 </html>
