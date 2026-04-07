@@ -871,6 +871,19 @@
       background: rgba(0, 212, 170, 0.08);
     }
 
+    .join-app-btn {
+      text-decoration: none;
+      display: block;
+      width: 100%;
+      text-align: center;
+      animation: ctaPulse 2.5s ease-in-out infinite;
+    }
+
+    .join-app-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(0, 212, 170, 0.5);
+    }
+
     .submit-btn {
       padding: var(--fib-3) var(--fib-4);
       background: linear-gradient(135deg, 
@@ -1014,6 +1027,25 @@
       width: 26px;
       height: 26px;
       fill: #ff0000;
+    }
+
+    .nav-instagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s, opacity 0.2s;
+      opacity: 0.7;
+    }
+
+    .nav-instagram:hover {
+      opacity: 1;
+      transform: scale(1.12);
+    }
+
+    .nav-instagram svg {
+      width: 24px;
+      height: 24px;
+      fill: #E1306C;
     }
 
     .nav-cta {
@@ -1186,6 +1218,18 @@
       margin-top: var(--fib-1);
     }
 
+    a.pearl-tier {
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+
+    a.pearl-tier:hover {
+      transform: translateY(-4px);
+      border-color: var(--teal-glow);
+      box-shadow: 0 0 16px rgba(0, 212, 170, 0.3);
+    }
+
     /* Partner card */
     .partner-grid {
       display: flex;
@@ -1204,6 +1248,15 @@
       align-items: center;
       gap: var(--fib-2);
       min-width: 200px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .partner-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
     }
 
     .partner-card img {
@@ -2539,20 +2592,24 @@
       OneAtATime
     </a>
     <div class="nav-cta">
-      <span class="nav-cta-text">Join the public beta now</span>
-      <a href="https://testflight.apple.com/join/evC8QckE" target="_blank" rel="noopener" class="nav-cta-button">Join Beta</a>
+      <span class="nav-cta-text">Join the app now</span>
+      <a href="https://testflight.apple.com/join/evC8QckE" target="_blank" rel="noopener" class="nav-cta-button">Join App</a>
     </div>
     <button class="nav-toggle" id="navToggle" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
     <div class="nav-links" id="navLinks">
+      <a href="#demo">Demo</a>
       <a href="#about">About Us</a>
       <a href="#team">Team</a>
-      <a href="#vision">Vision</a>
       <a href="#pearls">Pearls</a>
       <a href="#partners">Partners</a>
+      <a href="#contact">Contact</a>
       <a href="https://youtu.be/P3zOfo5pmRE?si=uKupT0lyi9xqv6Xy" target="_blank" rel="noopener" class="nav-youtube" aria-label="YouTube">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+      </a>
+      <a href="https://www.instagram.com/oneatatimedating" target="_blank" rel="noopener" class="nav-instagram" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
       </a>
     </div>
   </nav>
@@ -2587,19 +2644,19 @@
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            <span>Match with one person at a time. End your chat to match with someone new</span>
+            <span>Interact with other like-minded people</span>
           </div>
           <div class="value-prop" id="prop2">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            <span>The more you chat, the more pictures, videos and voice memos you'll discover about your match</span>
+            <span>Match with one person after getting to know them</span>
           </div>
           <div class="value-prop" id="prop3">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            <span>More meaningful features coming soon</span>
+            <span>Chat while revealing more about their bio, pictures and prompts</span>
           </div>
         </div>
       </div>
@@ -2627,25 +2684,8 @@
         </div>
       </div>
       
-      <!-- Bobbers -->
-      <div class="bobbers-container" id="bobbersContainer">
-        <div class="bobber-wrapper" onclick="document.getElementById('learnMore').scrollIntoView({behavior: 'smooth'})">
-          <span class="bobber-label">Learn More</span>
-          <div class="bobber">
-            <div class="bobber-top"></div>
-            <div class="bobber-body"></div>
-          </div>
-          <div class="fishing-line"></div>
-        </div>
-        
-        <div class="bobber-wrapper" onclick="document.getElementById('signupSection').scrollIntoView({behavior: 'smooth'})">
-          <span class="bobber-label">Sign Up</span>
-          <div class="bobber">
-            <div class="bobber-top"></div>
-            <div class="bobber-body"></div>
-          </div>
-          <div class="fishing-line"></div>
-        </div>
+      <!-- Bobbers (removed) -->
+      <div class="bobbers-container" id="bobbersContainer" style="display:none">
       </div>
     </section>
 
@@ -2805,14 +2845,11 @@
         </div>
         
         <h2 class="signup-title">Be First in the Water</h2>
-        <p class="signup-subtitle">Sign up for early access and receive 3 free pearls — boost your visibility when we launch.</p>
+        <p class="signup-subtitle">Join now and receive 3 free pearls to boost your visibility.</p>
         
-        <form class="signup-form" id="signupForm">
-          <input type="email" class="email-input" placeholder="Enter your email" required>
-          <button type="submit" class="submit-btn">Join Waitlist</button>
-        </form>
-        
-        <p class="privacy-note">No spam, ever. We respect your inbox like we respect your time.</p>
+        <div class="signup-form" id="signupForm">
+          <a href="https://testflight.apple.com/join/evC8QckE" target="_blank" rel="noopener" class="submit-btn join-app-btn">Join App</a>
+        </div>
       </div>
 
       <!-- Profile Card Stack -->
@@ -2860,6 +2897,26 @@
       </div>
     </section>
 
+    <!-- Demo -->
+    <section class="page-section" id="demo">
+      <div class="page-section-inner">
+        <h2 class="page-section-title"><span>Demo</span></h2>
+        <div style="position: relative; width: 100%; padding-bottom: 56.25%; border-radius: var(--fib-3); overflow: hidden;">
+          <iframe
+            width="560"
+            height="315"
+            src="https://www.youtube.com/embed/P3zOfo5pmRE?si=yEr6xjzuI26g4CxW"
+            title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen
+            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
+          ></iframe>
+        </div>
+      </div>
+    </section>
+
     <!-- About Us / Mission -->
     <section class="page-section" id="about">
       <div class="page-section-inner">
@@ -2896,17 +2953,6 @@
       </div>
     </section>
 
-    <!-- Vision -->
-    <section class="page-section" id="vision">
-      <div class="page-section-inner">
-        <h2 class="page-section-title"><span>Vision</span></h2>
-        <div class="page-section-body">
-          <p>We envision a world where dating apps encourage depth over volume. Where taking it slow isn't a disadvantage, and where every interaction feels worth your time. OneAtATime is built on the belief that the best connections happen when you're not distracted by dozens of options pulling you in different directions.</p>
-          <p>Our long-term vision is to become the go-to platform for people who value intentionality in how they meet someone new. We want to prove that a dating app can be designed around respect for your time, your energy, and your boundaries.</p>
-        </div>
-      </div>
-    </section>
-
     <!-- Pearls -->
     <section class="page-section" id="pearls">
       <div class="page-section-inner">
@@ -2915,18 +2961,18 @@
           <p>Pearls are OneAtATime Dating's in-app credits. When you sign up with your email, you'll get 3 free Pearls to start. You can use Pearls for premium features like more reveals, which leads to more matches. If you want more, you'll be able to purchase additional Pearls anytime.</p>
         </div>
         <div class="pearls-tiers">
-          <div class="pearl-tier">
+          <a href="https://testflight.apple.com/join/evC8QckE" target="_blank" rel="noopener" class="pearl-tier">
             <div class="pearl-tier-count">50 Pearls</div>
             <div class="pearl-tier-price">$4.99</div>
-          </div>
-          <div class="pearl-tier">
+          </a>
+          <a href="https://testflight.apple.com/join/evC8QckE" target="_blank" rel="noopener" class="pearl-tier">
             <div class="pearl-tier-count">100 Pearls</div>
             <div class="pearl-tier-price">$8.99</div>
-          </div>
-          <div class="pearl-tier">
+          </a>
+          <a href="https://testflight.apple.com/join/evC8QckE" target="_blank" rel="noopener" class="pearl-tier">
             <div class="pearl-tier-count">200 Pearls</div>
             <div class="pearl-tier-price">$14.99</div>
-          </div>
+          </a>
         </div>
         <div class="page-section-body">
           <p>We built Pearls to support the app in a way that still feels simple, flexible, and true to our mission: making dating feel less overwhelming and more meaningful.</p>
@@ -2939,10 +2985,22 @@
       <div class="page-section-inner">
         <h2 class="page-section-title"><span>Partners</span></h2>
         <div class="partner-grid">
-          <div class="partner-card">
+          <a href="https://cursor.com/" target="_blank" rel="noopener" class="partner-card">
             <img src="https://www.cursor.com/brand/icon.svg" alt="Cursor" onerror="this.onerror=null;this.src='https://asset.brandfetch.io/idMTVhJdt1/idYv1jQ_Ti.svg'">
             <div class="partner-card-name">Cursor</div>
-          </div>
+          </a>
+        </div>
+        <p class="page-section-body" style="margin-top: var(--fib-4);">OneAtATime Dating was built and developed with Cursor.</p>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="page-section" id="contact">
+      <div class="page-section-inner">
+        <h2 class="page-section-title"><span>Contact</span></h2>
+        <div class="page-section-body">
+          <p>Have questions, feedback, or just want to say hi? Reach out to us at</p>
+          <p><a href="mailto:support@oneatatime.dating" style="color: var(--teal-glow); text-decoration: none; font-weight: 600; font-size: var(--font-size-lg);">support@oneatatime.dating</a></p>
         </div>
       </div>
     </section>
@@ -3328,9 +3386,11 @@
       conversationInterval = setInterval(updateConversation, 7000);
     }
 
-    // Form submission – emails sent to Formspree
-    const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mzdvvqpv';
-    document.getElementById('signupForm').addEventListener('submit', function(e) {
+    // Form submission (legacy – form replaced with direct link)
+    const signupFormEl = document.getElementById('signupForm');
+    if (signupFormEl && signupFormEl.tagName === 'FORM') {
+      const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mzdvvqpv';
+      signupFormEl.addEventListener('submit', function(e) {
       e.preventDefault();
       const email = this.querySelector('input').value;
       const btn = this.querySelector('button');
@@ -3378,6 +3438,7 @@
         input.focus();
       }, 3000);
     });
+    }
 
     // Pearl pulse animation for success
     const style = document.createElement('style');
