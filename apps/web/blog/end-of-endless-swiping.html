@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The End of Endless Swiping | OneAtATime Blog</title>
+  <meta name="description" content="Why dating-app burnout is real, what Hinge's 'Your Turn Limits' feature is teaching us, and how to date with attention instead of volume.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ocean-abyss: #0a1628;
+      --ocean-deep: #0f2744;
+      --ocean-mid: #1a3a5c;
+      --teal-glow: #00d4aa;
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.78);
+      --text-muted: rgba(255, 255, 255, 0.5);
+      --font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font-family);
+      background: var(--ocean-abyss);
+      color: var(--text-secondary);
+      line-height: 1.75;
+      min-height: 100vh;
+    }
+
+    .legal-nav {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      padding: 21px 55px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      flex-wrap: wrap;
+    }
+
+    .legal-nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .legal-nav a:hover { color: var(--teal-glow); }
+    .legal-nav a.active { color: var(--teal-glow); }
+
+    .legal-nav .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: 16px;
+      text-decoration: none;
+      margin-right: auto;
+    }
+
+    .legal-nav .logo svg {
+      width: 34px;
+      height: auto;
+      stroke: var(--teal-glow);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .legal-nav .sep { color: var(--text-muted); }
+
+    .post-container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 55px 34px 89px;
+    }
+
+    .post-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 34px;
+      transition: color 0.2s;
+    }
+
+    .post-back:hover { color: var(--teal-glow); }
+
+    .post-meta {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 21px;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .post-meta .tag { color: var(--teal-glow); }
+
+    .post-container h1 {
+      font-size: 40px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 21px;
+      line-height: 1.2;
+      letter-spacing: -0.6px;
+    }
+
+    .post-byline {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 55px;
+      padding-bottom: 21px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .post-container h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-top: 55px;
+      margin-bottom: 13px;
+      letter-spacing: -0.2px;
+    }
+
+    .post-container p {
+      margin-bottom: 21px;
+      font-size: 17px;
+      color: var(--text-secondary);
+    }
+
+    .post-container a {
+      color: var(--teal-glow);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(0, 212, 170, 0.3);
+      transition: border-color 0.2s;
+    }
+
+    .post-container a:hover { border-color: var(--teal-glow); }
+
+    .post-cta {
+      margin-top: 55px;
+      padding: 34px;
+      background: rgba(0, 212, 170, 0.08);
+      border: 1px solid rgba(0, 212, 170, 0.2);
+      border-radius: 21px;
+      text-align: center;
+    }
+
+    .post-cta h3 {
+      font-size: 21px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 13px;
+    }
+
+    .post-cta p {
+      font-size: 15px;
+      margin-bottom: 21px;
+    }
+
+    .post-cta-button {
+      display: inline-block;
+      padding: 13px 34px;
+      background: var(--teal-glow);
+      color: var(--ocean-abyss);
+      font-weight: 700;
+      font-size: 15px;
+      border-radius: 100px;
+      text-decoration: none;
+      border: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 16px rgba(0, 212, 170, 0.35);
+    }
+
+    .post-cta-button:hover {
+      transform: scale(1.04);
+      box-shadow: 0 0 24px rgba(0, 212, 170, 0.55);
+      border-bottom: none;
+    }
+
+    .legal-footer {
+      text-align: center;
+      padding: 34px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .legal-footer a {
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .legal-footer a:hover { color: var(--teal-glow); }
+
+    @media (max-width: 600px) {
+      .legal-nav { padding: 13px 21px; gap: 10px; }
+      .post-container { padding: 34px 21px 55px; }
+      .post-container h1 { font-size: 30px; }
+      .post-container h2 { font-size: 20px; margin-top: 34px; }
+      .post-container p { font-size: 16px; }
+      .post-cta { padding: 21px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="legal-nav">
+    <a href="/" class="logo">
+      <svg viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 10 25 Q 30 5, 70 25 Q 30 45, 10 25 M 75 25 L 95 15 M 75 25 L 95 35" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="25" cy="22" r="4" stroke-width="2"/>
+      </svg>
+      OneAtATime
+    </a>
+    <a href="/blog.html" class="active">Blog</a>
+    <span class="sep">·</span>
+    <a href="/terms.html">Terms</a>
+    <span class="sep">·</span>
+    <a href="/privacy.html">Privacy</a>
+    <span class="sep">·</span>
+    <a href="/guidelines.html">Guidelines</a>
+  </nav>
+
+  <article class="post-container">
+    <a href="/blog.html" class="post-back">&larr; Back to Blog</a>
+
+    <div class="post-meta">
+      <span class="tag">Dating Tips</span>
+      <span>&middot;</span>
+      <span>5 min read</span>
+    </div>
+
+    <h1>The End of Endless Swiping: Why One Match at a Time Works and How to Date Without Burnout</h1>
+    <p class="post-byline">By the OneAtATime team</p>
+
+    <p>There's a reason so many people feel exhausted by dating apps, and no, it's not just because dating is hard.</p>
+
+    <p>A lot of dating apps are built around volume. More swipes. More matches. More conversations. More options. The whole experience quietly trains you to think that if you just keep swiping long enough, the right person will eventually appear. But for a lot of people, especially introverts, that approach does not create better dating. It creates burnout.</p>
+
+    <p>Hinge has even started pushing back on that mindset itself. The company tested, and later rolled out, a feature called "Your Turn Limits" that kicks in when eight or more people are waiting for your response. Hinge says the feature is meant to push daters toward quality over quantity, and its current help page explains that users who hit the limit need to reply to someone or end a chat before they can make new connections.</p>
+
+    <p>And honestly, that makes sense.</p>
+
+    <p>Imagine yourself sitting at a table with eight people, all waiting for your attention. That already sounds like a lot. Now imagine you are introverted, socially selective, or just someone who does not enjoy split attention in the first place. That is not exciting. That is draining.</p>
+
+    <p>It is no wonder so many people rarely feel successful on dating apps. The design of a lot of them encourages constant swiping and constant matching, and the business model usually benefits when you stay active, keep chasing the next match, and keep coming back for more.</p>
+
+    <p>A lot of users do not realize how quickly that turns into a weird cycle. You get a little dopamine rush from a new swipe, a new like, or a new match. Then another. Then another. And before long, you are not really dating anymore. You are collecting possibilities. You are bouncing between conversations, half-paying attention, forgetting who said what, and wondering why the whole thing feels so empty.</p>
+
+    <p>So what should you do about it?</p>
+
+    <p>Start by limiting the number of matches you entertain at once. As soon as you get a few matches, stop. Stop swiping. Stop matching. Stop chasing the next person for a second and put your energy into the people already in front of you.</p>
+
+    <p>Try to actually get to know someone. What do they like to do for fun? What are they into? What kind of life do they want? Do you share any values? Is there something about the way they think that you admire? Do you feel calmer talking to them, or more anxious?</p>
+
+    <p>That is where the real magic starts to happen.</p>
+
+    <p>When you stop treating dating like a numbers game, conversations get better. You stop feeling like you have eight tabs open in your brain. You stop performing for strangers and start actually paying attention. Instead of feeling overwhelmed and drained, you can begin to enjoy the process of getting to know someone. And when you are actually enjoying yourself, that energy comes through. People can feel when you are present. They can also feel when you are distracted.</p>
+
+    <p>The truth is that depth requires attention. Attention is hard when you are constantly splitting it.</p>
+
+    <p>That does not mean you need to become obsessive or overly serious about every single match. It just means you should give a real conversation a real chance before mentally running to the next person.</p>
+
+    <p>There are also a few simple things you can do to make dating apps feel less chaotic.</p>
+
+    <h2>1. Set a time limit for how long you spend on dating apps</h2>
+
+    <p>I know that sounds obvious, but it matters. A lot of people underestimate how much energy dating apps take up, not just while using them, but mentally. You can spend way too much time thinking about who texted, who liked you, who did not respond, or whether you should keep swiping. Putting a limit on that can protect your peace more than you think.</p>
+
+    <h2>2. If the conversation is flowing, try to meet within a few days</h2>
+
+    <p>Ask them to grab a coffee. Go to a park. Keep it simple. If you stay in the app too long, one of two things usually happens: either the energy dies, or the conversation turns into a fake version of intimacy that never becomes real. If you think there might actually be something there, see if it works in person.</p>
+
+    <h2>3. Define what you are actually looking for</h2>
+
+    <p>Put real things in your profile that make you who you are. Include your non-negotiables. That might be politics. It might be kids. It might be religion. It might be your dog, your weird hobby, your schedule, your lifestyle, or the fact that you have a special pet fish that needs a lot of love and attention. The point is that being clearer upfront saves time, saves energy, and usually leads to better matches.</p>
+
+    <p>A lot of people are scared that narrowing their focus will make them miss out. But most of the time, the opposite is true. Endless options do not always create better outcomes. A lot of the time, they just create more noise.</p>
+
+    <p>The best dating experiences usually do not come from talking to the most people possible. They come from giving the right person enough attention to see whether something real is there.</p>
+
+    <p>That is the whole point.</p>
+
+    <p>If dating apps have been making you feel tired, scattered, or emotionally numb, it might not be because you are bad at dating. It might be because the structure itself is pulling you in the wrong direction. More does not always mean better. Sometimes better just means slower, calmer, and more focused.</p>
+
+    <p>Instead of chasing as many matches as possible, try focusing on one conversation at a time. Give someone a real chance. See how different dating feels when you are not constantly split between eight people, eight chats, and eight possible outcomes.</p>
+
+    <p>If you want to try a different kind of dating experience, check out <a href="https://oneatatime.dating/" target="_blank" rel="noopener noreferrer">OneAtATime Dating</a>. It is a more introverted way of dating, where users match one at a time. Instead of encouraging you to swipe as much as possible, it is built around getting to know someone on a much deeper level.</p>
+
+    <div class="post-cta">
+      <h3>Try a calmer way to date.</h3>
+      <p>OneAtATime Dating is designed for people who want focus over noise.</p>
+      <a href="https://testflight.apple.com/join/evC8QckE" target="_blank" rel="noopener" class="post-cta-button">Join the public beta</a>
+    </div>
+  </article>
+
+  <footer class="legal-footer">
+    <p><a href="mailto:support@oneatatime.dating">support@oneatatime.dating</a></p>
+    <p style="margin-top: 8px;">&copy; 2026 OneAtATime. Finding your person, not your options.</p>
+  </footer>
+</body>
+</html>
