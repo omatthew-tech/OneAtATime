@@ -77,6 +77,15 @@
       padding: 55px 34px 89px;
     }
 
+    .post-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 13px;
+      margin-bottom: 34px;
+      flex-wrap: wrap;
+    }
+
     .post-back {
       display: inline-flex;
       align-items: center;
@@ -85,7 +94,6 @@
       text-decoration: none;
       font-size: 14px;
       font-weight: 500;
-      margin-bottom: 21px;
       transition: color 0.2s;
     }
 
@@ -99,7 +107,6 @@
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 100px;
-      margin-bottom: 34px;
     }
 
     .lang-toggle button {
@@ -227,11 +234,13 @@
   </nav>
 
   <article class="post-container">
-    <a href="/blog.html" class="post-back">&larr; Back to Blog</a>
+    <div class="post-topbar">
+      <a href="/blog.html" class="post-back">&larr; Back to Blog</a>
 
-    <div class="lang-toggle" role="tablist" aria-label="Language">
-      <button type="button" class="lang-btn active" data-lang="en" aria-label="English">English</button>
-      <button type="button" class="lang-btn" data-lang="id" aria-label="Bahasa Indonesia">Bahasa Indonesia</button>
+      <div class="lang-toggle" role="tablist" aria-label="Language">
+        <button type="button" class="lang-btn active" data-lang="en" aria-label="English">English</button>
+        <button type="button" class="lang-btn" data-lang="id" aria-label="Bahasa Indonesia">Bahasa Indonesia</button>
+      </div>
     </div>
 
     <!-- ENGLISH -->
